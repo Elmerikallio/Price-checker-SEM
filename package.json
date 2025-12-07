@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/Elmerikallio/Price-checker-SEM/issues"
   },
-  "homepage": "https://github.com/Elmerikallio/Price-checker-SEM#readme"
+  "homepage": "https://github.com/Elmerikallio/Price-checker-SEM#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
 }
