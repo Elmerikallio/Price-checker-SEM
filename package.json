@@ -1,0 +1,19 @@
+{
+  "name": "price-checker-sem",
+  "version": "1.0.0",
+  "description": "Price checker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elmerikallio/Price-checker-SEM.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Elmerikallio/Price-checker-SEM/issues"
+  },
+  "homepage": "https://github.com/Elmerikallio/Price-checker-SEM#readme"
+}
