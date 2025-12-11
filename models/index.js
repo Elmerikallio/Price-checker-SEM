@@ -18,7 +18,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// Import models (We will create these files next)
+// Import models
 db.prices = require("./price.model.js")(sequelize, Sequelize);
 db.stores = require("./store.model.js")(sequelize, Sequelize);
 db.users = require("./user.model.js")(sequelize, Sequelize);
