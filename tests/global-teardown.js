@@ -1,0 +1,11 @@
+/**
+ * Jest Global Teardown
+ * Runs once after all tests
+ */
+
+export default async function globalTeardown() {
+  console.log('🧹 Cleaning up test environment...');
+  
+  // Any global cleanup logic here
+  return Promise.resolve();
+}
