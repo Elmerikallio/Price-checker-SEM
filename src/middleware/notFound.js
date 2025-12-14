@@ -1,5 +1,6 @@
 export function notFound(req, res) {
   res.status(404).json({
-    error: { message: "Route not found", status: 404 },
+    error: "Not Found",
+    path: req.originalUrl,
   });
 }

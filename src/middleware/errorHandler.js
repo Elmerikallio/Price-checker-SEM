@@ -1,12 +1,15 @@
 export function errorHandler(err, req, res, next) {
-  console.error(err);
-
   const status = err.statusCode || 500;
-  const message = status === 500 ? "Internal Server Error" : err.message;
 
-  res.status(status).json({
-    error: {
-      message,
-    },
-  });
+  // Avoid leaking internals
+  const payload = {
+    error: err.name || "Error",
+    message: err.message || "Something went wrong",
+  };
+
+  if (process.env.NODE_ENV !== "production") {
+    payload.stack = err.stack;
+  }
+
+  res.status(status).json(payload);
 }
