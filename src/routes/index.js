@@ -1,14 +1,13 @@
-// src/routes/index.js
-const express = require("express");
-const healthRouter = require("./health.routes");
+import { Router } from "express";
 
-const router = express.Router();
+export const routes = Router();
 
-router.use("/health", healthRouter);
+routes.get("/", (req, res) => {
+  res.json({ name: "price-checker-backend", version: "v1" });
+});
 
-// later
-// router.use("/auth", require("./auth.routes"));
-// router.use("/stores", require("./stores.routes"));
-// router.use("/prices", require("./price.routes"));
-
-module.exports = router;
+// later:
+// routes.use("/auth", authRoutes);
+// routes.use("/admin", adminRoutes);
+// routes.use("/stores", storeRoutes);
+// routes.use("/prices", pricesRoutes);

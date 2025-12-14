@@ -1,33 +1,23 @@
-// src/app.js
-const express = require("express");
-const apiRouter = require("./routes");
+import cors from "cors";
+import express from "express";
+import helmet from "helmet";
 
-const app = express();
+import { errorHandler } from "./middleware/errorHandler.js";
+import { routes } from "./routes/index.js";
 
-// middleware
-app.use(express.json());
+export function createApp() {
+  const app = express();
 
-//simple logging
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
-  next();
-});
+  app.use(helmet());
+  app.use(cors());
+  app.use(express.json({ limit: "1mb" }));
 
-// API routes
-app.use("/api/v1", apiRouter);
+  app.get("/health", (req, res) => res.json({ ok: true }));
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    error: "Not Found",
-    path: req.path,
-  });
-});
+  app.use("/api/v1", routes);
 
-// error handler
-app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
-});
+  // last
+  app.use(errorHandler);
 
-module.exports = app;
+  return app;
+}

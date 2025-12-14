@@ -1,6 +1,7 @@
 {
   "name": "price-checker-sem",
   "version": "1.0.0",
+  "type": "module",
   "description": "Price checker",
   "main": "src/server.js",
   "scripts": {

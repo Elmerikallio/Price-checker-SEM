@@ -1,9 +1,9 @@
-// src/server.js
-require("dotenv").config();
-const app = require("./app");
+import "dotenv/config";
+import { createApp } from "./app.js";
 
-const PORT = process.env.PORT || 3000;
+const app = createApp();
+const port = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Price Checker backend listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`API listening on http://localhost:${port}`);
 });
