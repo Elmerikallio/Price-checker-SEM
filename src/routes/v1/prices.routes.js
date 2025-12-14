@@ -1,15 +1,15 @@
 import { Router } from "express";
 import {
   getNearbyPrices,
-  submitObservedPrice,
+  submitObservation,
 } from "../../controllers/prices.controller.js";
 
 const router = Router();
 
-// Shopper -> send observed price + location + barcode
-router.post("/observe", submitObservedPrice);
-router.post("/compare", getNearbyPrices);
-// Shopper -> query nearby prices
+// For browser testing: GET /api/v1/prices/nearby?gtin=...&lat=...&lng=...
 router.get("/nearby", getNearbyPrices);
+
+// For app: POST /api/v1/prices/observations
+router.post("/observations", submitObservation);
 
 export default router;
