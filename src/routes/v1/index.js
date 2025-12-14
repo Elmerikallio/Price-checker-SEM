@@ -1,13 +1,9 @@
 import { Router } from "express";
+// import more routes here later
 
-export const routes = Router();
+const router = Router();
 
-routes.get("/", (req, res) => {
-  res.json({ name: "price-checker-backend", version: "v1" });
-});
+router.use("/prices", priceRouter);
+router.use("/stores", storeRouter);
 
-// later:
-// routes.use("/auth", authRoutes);
-// routes.use("/admin", adminRoutes);
-// routes.use("/stores", storeRoutes);
-// routes.use("/prices", pricesRoutes);
+export default router;

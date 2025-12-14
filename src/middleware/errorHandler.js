@@ -1,27 +1,26 @@
-// src/middleware/errorHandler.js
+import { HttpError } from "../utils/httpError.js";
 
 export function errorHandler(err, req, res, next) {
-  const statusCode = err.statusCode || 500;
-  const isOperational = err.isOperational ?? false;
+  const isHttp = err instanceof HttpError;
 
-  // log safely (no secrets)
-  console.error({
-    message: err.message,
-    statusCode,
-    path: req.originalUrl,
-    method: req.method,
-    stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
-  });
+  const status = isHttp ? err.status : 500;
 
-  // do not leak internals
-  if (process.env.NODE_ENV === "production" && !isOperational) {
-    return res.status(500).json({
-      error: "Internal server error",
-    });
+  // Don’t leak internals
+  const safeMessage =
+    status >= 500 ? "Internal server error" : err.message || "Bad request";
+
+  // optional, include validation details on 400 in dev
+  const payload = {
+    error: {
+      message: safeMessage,
+      status,
+      ...(isHttp && err.details ? { details: err.details } : {}),
+    },
+  };
+
+  if (process.env.NODE_ENV !== "production") {
+    console.error(err);
   }
 
-  // development / known errors
-  res.status(statusCode).json({
-    error: err.message,
-  });
+  res.status(status).json(payload);
 }
