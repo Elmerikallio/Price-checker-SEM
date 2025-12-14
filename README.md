@@ -126,6 +126,7 @@ price-checker-sem/
 │   └── seed.js                # 🌱 Database seeding script
 ├── 📁 docs/
 │   ├── DATABASE_MIGRATION.md  # 📖 Complete migration documentation
+│   ├── TESTING.md             # 🧪 Comprehensive testing guide  
 │   └── PRISMA_QUICK_REFERENCE.md # ⚡ Developer quick reference
 ├── 📁 src/
 │   ├── server.js              # 🚀 App entry point
@@ -416,6 +417,7 @@ npm run db:studio
 
 1. **Check the documentation**:
    - [docs/DATABASE_MIGRATION.md](docs/DATABASE_MIGRATION.md) - Complete migration guide
+   - [docs/TESTING.md](docs/TESTING.md) - Comprehensive testing guide
    - [docs/PRISMA_QUICK_REFERENCE.md](docs/PRISMA_QUICK_REFERENCE.md) - Developer reference
 
 2. **Review logs**: The application uses structured logging
