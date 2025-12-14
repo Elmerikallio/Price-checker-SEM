@@ -1,14 +1,10 @@
-// src/db/prisma.js
-import { PrismaClient } from "@prisma/client";
+let prisma = null;
 
-export const prisma = new PrismaClient();
+if (process.env.DB_ENABLED === "true") {
+  const { PrismaClient } = await import("@prisma/client");
+  prisma = new PrismaClient();
+} else {
+  console.warn("⚠️ DB disabled – running without Prisma");
+}
 
-// clean shutdown (nice in dev + tests)
-process.on("SIGINT", async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-});
-process.on("SIGTERM", async () => {
-  await prisma.$disconnect();
-  process.exit(0);
-});
+export default prisma;

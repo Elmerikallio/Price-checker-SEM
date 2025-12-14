@@ -1,17 +1,10 @@
-import cors from "cors";
-import express from "express";
-import helmet from "helmet";
-import v1Router from "./routes/v1/index.js";
+import dotenv from "dotenv";
+import app from "./app.js";
 
-const app = express();
+dotenv.config();
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
+const port = process.env.PORT || 3000;
 
-app.use("/api/v1", v1Router);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });

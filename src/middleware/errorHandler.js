@@ -1,26 +1,12 @@
-import { HttpError } from "../utils/httpError.js";
-
 export function errorHandler(err, req, res, next) {
-  const isHttp = err instanceof HttpError;
+  console.error(err);
 
-  const status = isHttp ? err.status : 500;
+  const status = err.statusCode || 500;
+  const message = status === 500 ? "Internal Server Error" : err.message;
 
-  // Don’t leak internals
-  const safeMessage =
-    status >= 500 ? "Internal server error" : err.message || "Bad request";
-
-  // optional, include validation details on 400 in dev
-  const payload = {
+  res.status(status).json({
     error: {
-      message: safeMessage,
-      status,
-      ...(isHttp && err.details ? { details: err.details } : {}),
+      message,
     },
-  };
-
-  if (process.env.NODE_ENV !== "production") {
-    console.error(err);
-  }
-
-  res.status(status).json(payload);
+  });
 }

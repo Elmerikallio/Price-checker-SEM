@@ -1,14 +1,13 @@
 // src/routes/health.routes.js
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+
+const router = Router();
 
 router.get("/", (req, res) => {
-  res.json({
+  res.status(200).json({
     status: "ok",
-    service: "price-checker-backend",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
+    time: new Date().toISOString(),
   });
 });
 
-module.exports = router;
+export default router;
