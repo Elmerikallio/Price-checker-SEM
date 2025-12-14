@@ -125,6 +125,7 @@ price-checker-sem/
 ├── 📁 scripts/
 │   └── seed.js                # 🌱 Database seeding script
 ├── 📁 docs/
+│   ├── ASSIGNMENT_COMPLIANCE.md # 🎯 Assignment compliance & evaluation
 │   ├── DATABASE_MIGRATION.md  # 📖 Complete migration documentation
 │   ├── TESTING.md             # 🧪 Comprehensive testing guide  
 │   └── PRISMA_QUICK_REFERENCE.md # ⚡ Developer quick reference
@@ -416,6 +417,7 @@ npm run db:studio
 ### Getting Help
 
 1. **Check the documentation**:
+   - [docs/ASSIGNMENT_COMPLIANCE.md](docs/ASSIGNMENT_COMPLIANCE.md) - Complete assignment compliance analysis
    - [docs/DATABASE_MIGRATION.md](docs/DATABASE_MIGRATION.md) - Complete migration guide
    - [docs/TESTING.md](docs/TESTING.md) - Comprehensive testing guide
    - [docs/PRISMA_QUICK_REFERENCE.md](docs/PRISMA_QUICK_REFERENCE.md) - Developer reference
