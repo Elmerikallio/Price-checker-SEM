@@ -4,4 +4,158 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Admin users who manage the system
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Hashed password
+  role      UserRole @default(ADMIN)
+  createdBy Int?     // ID of admin who created this user
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Self-referential relation for tracking who created whom
+  creator       User?  @relation("UserCreator", fields: [createdBy], references: [id])
+  createdUsers  User[] @relation("UserCreator")
+
+  @@map("users")
+}
+
+// Store users who can manage their store's prices and discounts
+model Store {
+  id        Int         @id @default(autoincrement())
+  name      String      // Store display name
+  email     String      @unique
+  password  String      // Hashed password
+  status    StoreStatus @default(PENDING)
+  latitude  Decimal     @db.Decimal(10, 8) // Store location
+  longitude Decimal     @db.Decimal(11, 8) // Store location
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  prices    Price[]
+  discounts Discount[]
+
+  @@map("stores")
+}
+
+// Product information (automatically created when first price is submitted)
+model Product {
+  id          String @id @default(cuid()) // Using cuid for better performance
+  barcode     String
+  barcodeType String
+  name        String? // Optional product name
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  prices    Price[]
+  discounts Discount[]
+
+  @@unique([barcode, barcodeType])
+  @@map("products")
+}
+
+// Price observations from both shoppers and store users
+model Price {
+  id          String      @id @default(cuid())
+  productId   String
+  storeId     Int?        // Null if submitted by shopper
+  amount      Decimal     @db.Decimal(10, 2)
+  latitude    Decimal     @db.Decimal(10, 8)
+  longitude   Decimal     @db.Decimal(11, 8)
+  source      PriceSource @default(SHOPPER)
+  observedAt  DateTime    @default(now())
+  isActive    Boolean     @default(true) // For soft deletion of old prices
+  createdAt   DateTime    @default(now())
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store   Store?  @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  @@index([productId, isActive, observedAt])
+  @@index([latitude, longitude])
+  @@map("prices")
+}
+
+// Store-specific discounts for app users only
+model Discount {
+  id          String   @id @default(cuid())
+  storeId     Int
+  productId   String
+  percentage  Decimal  @db.Decimal(5, 2) // e.g., 15.50 for 15.5%
+  amount      Decimal? @db.Decimal(10, 2) // Fixed amount discount (alternative to percentage)
+  description String?  // Optional description of the discount
+  validFrom   DateTime @default(now())
+  validUntil  DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  store   Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, productId]) // One discount per product per store
+  @@index([isActive, validFrom, validUntil])
+  @@map("discounts")
+}
+
+// Audit log for admin operations
+model AuditLog {
+  id          String           @id @default(cuid())
+  userId      Int
+  action      AuditAction
+  targetType  AuditTargetType?
+  targetId    String?
+  details     Json? // Additional details about the operation
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  LOCKED
+}
+
+enum PriceSource {
+  SHOPPER
+  STORE_USER
+}
+
+enum AuditAction {
+  USER_CREATED
+  USER_DELETED
+  USER_UPDATED
+  STORE_APPROVED
+  STORE_LOCKED
+  STORE_UNLOCKED
+  STORE_DELETED
+  STORE_UPDATED
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+}
+
+enum AuditTargetType {
+  USER
+  STORE
+  PRODUCT
+  PRICE
+  DISCOUNT
 }

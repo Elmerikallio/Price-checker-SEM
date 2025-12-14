@@ -1,4 +1,6 @@
-// src/db/index.js  (ESM)
+// src/db/index.js
+import { prisma } from './prisma.js';
+
 const useMock = process.env.USE_MOCK_DB === "true";
 
 export const db = useMock

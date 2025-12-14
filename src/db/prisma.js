@@ -1,10 +1,28 @@
-let prisma = null;
+import { PrismaClient } from '@prisma/client';
+import { logger } from '../utils/logger.js';
 
-if (process.env.DB_ENABLED === "true") {
-  const { PrismaClient } = await import("@prisma/client");
-  prisma = new PrismaClient();
-} else {
-  console.warn("⚠️ DB disabled – running without Prisma");
-}
+const prisma = new PrismaClient({
+  log: process.env.NODE_ENV === 'development' 
+    ? ['query', 'info', 'warn', 'error']
+    : ['error'],
+});
 
-export default prisma;
+// Handle graceful shutdown
+process.on('beforeExit', async () => {
+  logger.info('Disconnecting from database...');
+  await prisma.$disconnect();
+});
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, disconnecting from database...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, disconnecting from database...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+export { prisma };
