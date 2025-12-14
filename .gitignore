@@ -3,6 +3,18 @@
 .env.local
 .env.*.local
 
+# SSL certificates (keep structure, ignore actual certificates)
+nginx/ssl/*.crt
+nginx/ssl/*.key
+nginx/ssl/*.pem
+
+# Docker volumes and logs
+logs/
+docker-data/
+
+# Production overrides (keep .env.production as template)
+.env.production.local
+
 # Dependencies
 node_modules/
 npm-debug.log*

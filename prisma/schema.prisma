@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -65,9 +65,9 @@ model Price {
   id          String      @id @default(cuid())
   productId   String
   storeId     Int?        // Null if submitted by shopper
-  amount      Decimal     @db.Decimal(10, 2)
-  latitude    Decimal     @db.Decimal(10, 8)
-  longitude   Decimal     @db.Decimal(11, 8)
+  amount      Float
+  latitude    Float?
+  longitude   Float?
   source      PriceSource @default(SHOPPER)
   observedAt  DateTime    @default(now())
   isActive    Boolean     @default(true) // For soft deletion of old prices

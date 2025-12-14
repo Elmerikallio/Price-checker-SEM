@@ -612,19 +612,34 @@ Business logic isolated from Express
 
 🚀 Deployment
 
-Platform-independent Node.js app
+### Quick Deploy (All Platforms)
 
-Environment-based configuration
+**Windows:**
+```batch
+scripts\\deploy.bat production
+```
 
-Works on:
+**Linux/macOS/WSL:**
+```bash
+./scripts/deploy.sh production
+```
 
-Linux
+### Production Features
+- **🐳 Docker containerization** with multi-stage builds
+- **🔒 HTTPS by default** with Nginx reverse proxy  
+- **🛡️ Security hardening** (non-root containers, security headers)
+- **📊 Health monitoring** and logging
+- **🗄️ MySQL database** with automatic migrations
+- **🔄 Auto-restart policies** and health checks
 
-Windows
+### Supported Platforms
+✅ **Linux** (Ubuntu, Debian, RHEL, CentOS)  
+✅ **Windows** 10/11 with Docker Desktop  
+✅ **macOS** with Docker Desktop  
+✅ **Cloud Platforms** (AWS, GCP, Azure)  
+✅ **Container Orchestration** (Kubernetes, Docker Swarm)
 
-Cloud platforms (Docker-ready)
-
-Deployment instructions will be expanded during the project.
+**📖 Complete Guide**: See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for detailed instructions
 
 📜 License
 
