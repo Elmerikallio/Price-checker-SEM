@@ -1,16 +1,39 @@
 import { Router } from "express";
 import {
+  getAllStoresForAdmin,
   approveStoreUser,
+  rejectStoreUser,
   lockStoreUser,
-  removeStoreUser,
   unlockStoreUser,
+  removeStoreUser,
+  getAuditLogs,
+  getSystemStats
 } from "../../controllers/admin.controller.js";
+import { requireAdmin, requireSuperAdmin } from "../../middleware/auth.js";
 
 const router = Router();
 
+// All admin routes require admin authentication
+router.use(requireAdmin);
+
+// Store management
+router.get("/stores", getAllStoresForAdmin);
+router.post("/stores/:id/approve", approveStoreUser);
+router.post("/stores/:id/reject", rejectStoreUser);
+router.post("/stores/:id/suspend", lockStoreUser);
+router.post("/stores/:id/reactivate", unlockStoreUser);
+
+// Super admin only routes
+router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
+
+// Audit and statistics
+router.get("/audit-logs", getAuditLogs);
+router.get("/statistics", getSystemStats);
+
+// Legacy routes (maintain backward compatibility)
 router.post("/store-users/:id/approve", approveStoreUser);
 router.post("/store-users/:id/lock", lockStoreUser);
 router.post("/store-users/:id/unlock", unlockStoreUser);
-router.delete("/store-users/:id", removeStoreUser);
+router.delete("/store-users/:id", requireSuperAdmin, removeStoreUser);
 
 export default router;
