@@ -1,9 +1,9 @@
+// src/routes/v1/index.js
 import { Router } from "express";
-// import more routes here later
+import priceRouter from "./prices.routes.js";
 
 const router = Router();
 
 router.use("/prices", priceRouter);
-router.use("/stores", storeRouter);
 
 export default router;
