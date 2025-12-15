@@ -159,7 +159,7 @@ Thumbs.db
 uploads/
 storage/
 public/uploads/
-docs/
+
 
 # PM2 process file
 ecosystem.config.js
