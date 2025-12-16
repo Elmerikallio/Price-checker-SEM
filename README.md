@@ -126,6 +126,7 @@ price-checker-sem/
 │   └── seed.js                # 🌱 Database seeding script
 ├── 📁 docs/
 │   ├── DEMONSTRATION_GUIDE.md   # 🚀 How to show it's working
+│   ├── ADMIN_ACCOUNT.md         # 🔐 Admin account setup and management
 │   ├── ASSIGNMENT_COMPLIANCE.md # 🎯 Assignment compliance & evaluation
 │   ├── DATABASE_MIGRATION.md    # 📖 Complete migration documentation
 │   ├── TESTING.md               # 🧪 Comprehensive testing guide  
@@ -419,6 +420,7 @@ npm run db:studio
 
 1. **Check the documentation**:
    - [docs/DEMONSTRATION_GUIDE.md](docs/DEMONSTRATION_GUIDE.md) - 🚀 **How to show it's working**
+   - [docs/ADMIN_ACCOUNT.md](docs/ADMIN_ACCOUNT.md) - 🔐 **Admin account setup and management**
    - [docs/ASSIGNMENT_COMPLIANCE.md](docs/ASSIGNMENT_COMPLIANCE.md) - Complete assignment compliance analysis
    - [docs/DATABASE_MIGRATION.md](docs/DATABASE_MIGRATION.md) - Complete migration guide
    - [docs/TESTING.md](docs/TESTING.md) - Comprehensive testing guide

@@ -19,7 +19,7 @@ export async function createDiscount(discountData) {
           select: {
             id: true,
             name: true,
-            address: true
+            
           }
         }
       }
@@ -51,8 +51,8 @@ export async function findDiscountsByStore(storeId, options = {}) {
       isActive: includeInactive ? undefined : true,
       ...(type && { type }),
       ...(!includeExpired && {
-        startDate: { lte: now },
-        endDate: { gte: now }
+        validFrom: { lte: now },
+        validUntil: { gte: now }
       })
     };
 
@@ -62,7 +62,7 @@ export async function findDiscountsByStore(storeId, options = {}) {
         store: {
           select: {
             name: true,
-            address: true
+            
           }
         }
       },
@@ -91,20 +91,20 @@ export async function findActiveDiscountsByStores(storeIds) {
           in: storeIds
         },
         isActive: true,
-        startDate: { lte: now },
-        endDate: { gte: now }
+        validFrom: { lte: now },
+        validUntil: { gte: now }
       },
       include: {
         store: {
           select: {
             id: true,
             name: true,
-            address: true
+            
           }
         }
       },
       orderBy: {
-        value: 'desc'
+        percentage: 'desc'
       }
     });
   } catch (error) {
@@ -128,7 +128,7 @@ export async function updateDiscount(id, updateData) {
         store: {
           select: {
             name: true,
-            address: true
+            
           }
         }
       }
@@ -175,7 +175,7 @@ export async function findDiscountById(id) {
           select: {
             id: true,
             name: true,
-            address: true
+            
           }
         }
       }
@@ -209,8 +209,8 @@ export async function getAllDiscounts(options = {}) {
       ...(storeId && { storeId }),
       ...(type && { type }),
       ...(!includeExpired && {
-        startDate: { lte: now },
-        endDate: { gte: now }
+        validFrom: { lte: now },
+        validUntil: { gte: now }
       })
     };
 
@@ -224,7 +224,7 @@ export async function getAllDiscounts(options = {}) {
             select: {
               id: true,
               name: true,
-              address: true
+              
             }
           }
         },

@@ -320,3 +320,64 @@ export async function getStorePrices(req, res, next) {
     next(error);
   }
 }
+
+/**
+ * Submit batch price observations (Store-only)
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+export async function submitBatchObservations(req, res, next) {
+  try {
+    const { user } = req;
+    const { observations } = req.body;
+
+    // Validate batch size
+    if (!Array.isArray(observations)) {
+      throw new HttpError(400, 'Observations must be an array', 'VALIDATION_ERROR');
+    }
+
+    if (observations.length === 0) {
+      throw new HttpError(400, 'At least one observation is required', 'VALIDATION_ERROR');
+    }
+
+    if (observations.length > 100) {
+      throw new HttpError(400, 'Maximum batch size is 100 observations', 'VALIDATION_ERROR');
+    }
+
+    let processed = 0;
+    let errors = [];
+
+    for (const obs of observations) {
+      try {
+        // Create the price observation
+        await createPriceObservation({
+          barcode: obs.barcode,
+          barcodeType: obs.barcodeType || 'EAN13',
+          productName: obs.productName,
+          amount: obs.amount,
+          latitude: obs.latitude,
+          longitude: obs.longitude,
+          source: 'store_upload',
+          storeId: user.storeId,
+          metadata: obs.metadata || {}
+        });
+        processed++;
+      } catch (error) {
+        errors.push({
+          observation: obs,
+          error: error.message
+        });
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Batch processing completed. ${processed} observations processed.`,
+      processed,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}

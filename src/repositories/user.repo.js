@@ -18,10 +18,8 @@ export async function findUserByEmail(email) {
         id: true,
         email: true,
         password: true,
-        firstName: true,
-        lastName: true,
         role: true,
-        isActive: true,
+        createdBy: true,
         createdAt: true,
         updatedAt: true
       }
@@ -47,7 +45,7 @@ export async function findUserById(id) {
         firstName: true,
         lastName: true,
         role: true,
-        isActive: true,
+        id: true,
         createdAt: true,
         updatedAt: true
       }
@@ -73,7 +71,7 @@ export async function createUser(userData) {
         firstName: true,
         lastName: true,
         role: true,
-        isActive: true,
+        id: true,
         createdAt: true
       }
     });
@@ -100,7 +98,7 @@ export async function updateUser(id, updateData) {
         firstName: true,
         lastName: true,
         role: true,
-        isActive: true,
+        id: true,
         updatedAt: true
       }
     });
@@ -128,7 +126,7 @@ export async function getAllUsers(skip = 0, take = 10) {
           firstName: true,
           lastName: true,
           role: true,
-          isActive: true,
+          id: true,
           createdAt: true
         },
         orderBy: {
@@ -154,11 +152,11 @@ export async function deleteUser(id) {
   try {
     return await prisma.user.update({
       where: { id },
-      data: { isActive: false },
+      data: { createdBy: null },
       select: {
         id: true,
         email: true,
-        isActive: true
+        id: true
       }
     });
   } catch (error) {

@@ -26,7 +26,7 @@ export async function findStoreByEmail(email) {
         phone: true,
         website: true,
         status: true,
-        isActive: true,
+        id: true,
         createdAt: true,
         updatedAt: true
       }
@@ -56,7 +56,7 @@ export async function findStoreById(id) {
         phone: true,
         website: true,
         status: true,
-        isActive: true,
+        id: true,
         createdAt: true,
         updatedAt: true
       }
@@ -137,7 +137,7 @@ export async function findNearbyStores(latitude, longitude, radiusKm = 10) {
     // Get all active approved stores
     const stores = await prisma.store.findMany({
       where: {
-        isActive: true,
+        id: true,
         status: 'APPROVED'
       },
       select: {
@@ -182,13 +182,11 @@ export async function getAllStores(options = {}) {
     const {
       skip = 0,
       take = 10,
-      status,
-      isActive = true,
+      status = 'ACTIVE',
       search
     } = options;
 
     const whereClause = {
-      isActive,
       ...(status && { status }),
       ...(search && {
         OR: [
@@ -212,7 +210,7 @@ export async function getAllStores(options = {}) {
           phone: true,
           website: true,
           status: true,
-          isActive: true,
+          id: true,
           createdAt: true,
           updatedAt: true
         },
@@ -264,11 +262,11 @@ export async function deleteStore(id) {
   try {
     return await prisma.store.update({
       where: { id },
-      data: { isActive: false },
+      data: { status: 'INACTIVE' },
       select: {
         id: true,
         name: true,
-        isActive: true
+        id: true
       }
     });
   } catch (error) {

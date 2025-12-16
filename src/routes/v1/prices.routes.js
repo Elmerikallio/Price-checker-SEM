@@ -3,7 +3,8 @@ import {
   getNearbyPrices,
   submitObservation,
   getProductPriceHistory,
-  getStorePrices
+  getStorePrices,
+  submitBatchObservations
 } from "../../controllers/prices.controller.js";
 import { requireAuth, requireStore, optionalAuth } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
@@ -25,5 +26,6 @@ router.post("/observations",
 
 // Store-only routes
 router.get("/store/prices", requireStore, getStorePrices);
+router.post("/batch", requireStore, submitBatchObservations);
 
 export default router;

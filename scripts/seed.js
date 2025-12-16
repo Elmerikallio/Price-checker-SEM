@@ -24,10 +24,7 @@ async function seedDatabase() {
         data: {
           email: adminEmail,
           password: hashedPassword,
-          firstName: 'Super',
-          lastName: 'Admin',
-          role: 'SUPER_ADMIN',
-          isActive: true,
+          role: 'SUPER_ADMIN'
         }
       });
 
