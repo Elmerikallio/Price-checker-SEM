@@ -1,1 +1,28 @@
-{\n  \"presets\": [\n    [\n      \"@babel/preset-env\",\n      {\n        \"targets\": {\n          \"node\": \"current\"\n        },\n        \"modules\": \"commonjs\"\n      }\n    ]\n  ]\n}\n
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current"
+        },
+        "modules": "auto"
+      }
+    ]
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            },
+            "modules": "commonjs"
+          }
+        ]
+      ]
+    }
+  }
+}

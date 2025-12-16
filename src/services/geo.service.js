@@ -83,13 +83,13 @@ export function getBoundingBox(latitude, longitude, radiusKm) {
   const angularDistance = radiusKm / R;
   
   // Calculate latitude bounds
-  const minLat = Math.max(-90, latitude - Math.toDegrees(angularDistance));
-  const maxLat = Math.min(90, latitude + Math.toDegrees(angularDistance));
+  const minLat = Math.max(-90, latitude - (angularDistance * 180 / Math.PI));
+  const maxLat = Math.min(90, latitude + (angularDistance * 180 / Math.PI));
   
   // Calculate longitude bounds (adjusted for latitude)
-  const deltaLng = Math.asin(Math.sin(angularDistance) / Math.cos(toRadians(latitude)));
-  const minLng = longitude - Math.toDegrees(deltaLng);
-  const maxLng = longitude + Math.toDegrees(deltaLng);
+  const deltaLng = Math.asin(Math.sin(angularDistance) / Math.cos(latitude * Math.PI / 180));
+  const minLng = longitude - (deltaLng * 180 / Math.PI);
+  const maxLng = longitude + (deltaLng * 180 / Math.PI);
   
   return {
     minLat,

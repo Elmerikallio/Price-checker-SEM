@@ -22,7 +22,7 @@ export async function createPriceObservation(priceData) {
       currency = 'EUR',
       latitude,
       longitude,
-      source = 'USER_REPORTED',
+      source = 'SHOPPER',
       confidence = 1.0
     } = priceData;
 
@@ -34,12 +34,10 @@ export async function createPriceObservation(priceData) {
       data: {
         productId: product.id,
         storeId,
-        price,
-        currency,
+        amount: price,
         latitude,
         longitude,
         source,
-        confidence
       },
       include: {
         product: {
@@ -47,9 +45,7 @@ export async function createPriceObservation(priceData) {
             id: true,
             barcode: true,
             barcodeType: true,
-            name: true,
-            category: true,
-            brand: true
+            name: true
           }
         },
         store: {
@@ -93,8 +89,7 @@ export async function findPricesByProduct(barcode, barcodeType, options = {}) {
         },
         isActive: includeInactive ? undefined : true,
         store: {
-          isActive: true,
-          status: 'APPROVED'
+          status: 'ACTIVE'
         }
       },
       include: {
@@ -102,16 +97,13 @@ export async function findPricesByProduct(barcode, barcodeType, options = {}) {
           select: {
             barcode: true,
             barcodeType: true,
-            name: true,
-            category: true,
-            brand: true
+            name: true
           }
         },
         store: {
           select: {
             id: true,
             name: true,
-            address: true,
             latitude: true,
             longitude: true
           }
@@ -148,8 +140,7 @@ export async function findNearbyPrices(latitude, longitude, barcode, barcodeType
         },
         isActive: true,
         store: {
-          isActive: true,
-          status: 'APPROVED'
+          status: 'ACTIVE'
         }
       },
       include: {
@@ -157,16 +148,13 @@ export async function findNearbyPrices(latitude, longitude, barcode, barcodeType
           select: {
             barcode: true,
             barcodeType: true,
-            name: true,
-            category: true,
-            brand: true
+            name: true
           }
         },
         store: {
           select: {
             id: true,
             name: true,
-            address: true,
             latitude: true,
             longitude: true
           }
@@ -262,9 +250,7 @@ export async function getLatestPricesByStore(storeId, limit = 20) {
           select: {
             barcode: true,
             barcodeType: true,
-            name: true,
-            category: true,
-            brand: true
+            name: true
           }
         }
       },

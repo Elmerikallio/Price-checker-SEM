@@ -43,13 +43,13 @@ export async function requireAuth(req, res, next) {
     let user;
     if (decoded.type === 'user') {
       user = await findUserById(decoded.id);
-      if (!user || !user.isActive) {
-        throw new HttpError(401, 'User account not found or inactive');
+      if (!user) {
+        throw new HttpError(401, 'User account not found');
       }
     } else if (decoded.type === 'store') {
       user = await findStoreById(decoded.id);
-      if (!user || !user.isActive || user.status !== 'APPROVED') {
-        throw new HttpError(401, 'Store account not found, inactive, or not approved');
+      if (!user || user.status !== 'ACTIVE') {
+        throw new HttpError(401, 'Store account not found or not approved');
       }
     } else {
       throw new HttpError(401, 'Invalid token type');

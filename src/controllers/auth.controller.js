@@ -44,7 +44,7 @@ export async function login(req, res, next) {
         throw new HttpError(401, 'Invalid store credentials');
       }
 
-      if (user.status !== 'APPROVED') {
+      if (user.status !== 'ACTIVE') {
         throw new HttpError(401, 'Store account is not approved yet');
       }
     } else {

@@ -19,7 +19,7 @@ import { HttpError } from '../utils/httpError.js';
 function priceLabel(price, allPrices) {
   if (allPrices.length === 0) return 'unknown';
   
-  const prices = allPrices.map(p => parseFloat(p.price));
+  const prices = allPrices.map(p => parseFloat(p.amount));
   const sorted = prices.sort((a, b) => a - b);
   const currentPrice = parseFloat(price);
   
@@ -67,7 +67,7 @@ export async function getNearbyPrices(req, res, next) {
       return res.json({
         success: true,
         message: 'No prices found for this product in the specified area',
-        results: [],
+        prices: [],
         searchArea: {
           center: { lat: latitude, lng: longitude },
           radius: searchRadius
@@ -89,14 +89,13 @@ export async function getNearbyPrices(req, res, next) {
     // Format results with price labels and discounts
     const results = prices.map(price => {
       const storeDiscounts = discountMap[price.storeId] || [];
-      const priceValue = parseFloat(price.price);
+      const priceValue = parseFloat(price.amount);
       
       return {
         id: price.id,
         store: {
           id: price.store.id,
           name: price.store.name,
-          address: price.store.address,
           location: {
             lat: parseFloat(price.store.latitude),
             lng: parseFloat(price.store.longitude)
@@ -106,14 +105,10 @@ export async function getNearbyPrices(req, res, next) {
         product: {
           barcode: price.product.barcode,
           barcodeType: price.product.barcodeType,
-          name: price.product.name,
-          category: price.product.category,
-          brand: price.product.brand
+          name: price.product.name
         },
         price: priceValue,
-        currency: price.currency,
         label: priceLabel(priceValue, prices),
-        confidence: price.confidence,
         source: price.source,
         observedAt: price.observedAt,
         discounts: storeDiscounts.map(d => ({
@@ -128,7 +123,7 @@ export async function getNearbyPrices(req, res, next) {
 
     res.json({
       success: true,
-      results,
+      prices: results,
       searchArea: {
         center: { lat: latitude, lng: longitude },
         radius: searchRadius
@@ -221,10 +216,8 @@ export async function submitObservation(req, res, next) {
         id: priceObservation.id,
         product: priceObservation.product,
         store: priceObservation.store,
-        price: parseFloat(priceObservation.price),
-        currency: priceObservation.currency,
+        price: parseFloat(priceObservation.amount),
         source: priceObservation.source,
-        confidence: priceObservation.confidence,
         observedAt: priceObservation.observedAt
       }
     });
@@ -317,10 +310,8 @@ export async function getStorePrices(req, res, next) {
       prices: prices.map(price => ({
         id: price.id,
         product: price.product,
-        price: parseFloat(price.price),
-        currency: price.currency,
+        price: parseFloat(price.amount),
         source: price.source,
-        confidence: price.confidence,
         observedAt: price.observedAt
       }))
     });

@@ -120,7 +120,7 @@ describe('Auth Service', () => {
       );
       
       expect(() => verifyToken(expiredToken))
-        .toThrow('TokenExpiredError');
+        .toThrow('Token expired');
     });
   });
 

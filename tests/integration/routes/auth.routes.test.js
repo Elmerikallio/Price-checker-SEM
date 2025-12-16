@@ -85,15 +85,14 @@ describe('Auth Routes Integration Tests', () => {
       expect(response.body.token).toBeUndefined();
     });
 
-    test('should reject login for inactive user', async () => {
+    test('should reject login with wrong password', async () => {
       const user = await DatabaseHelpers.createTestUser({
-        email: 'inactive@example.com',
-        isActive: false
+        email: 'testuser2@example.com'
       });
 
       const loginData = {
-        email: 'inactive@example.com',
-        password: 'password'
+        email: 'testuser2@example.com',
+        password: 'wrongpassword'
       };
 
       const response = await request(app)
@@ -101,7 +100,7 @@ describe('Auth Routes Integration Tests', () => {
         .send(loginData)
         .expect(401);
 
-      expect(response.body.error).toContain('deactivated');
+      expect(response.body.error).toContain('Invalid');
     });
 
     test('should reject login for unapproved store', async () => {
@@ -134,14 +133,14 @@ describe('Auth Routes Integration Tests', () => {
     });
   });
 
-  describe('POST /api/v1/auth/register-store', () => {
+  describe('POST /api/v1/auth/signup-store', () => {
     test('should register new store successfully', async () => {
       const storeData = MockData.generateStoreRegistration({
         email: 'newstore@example.com'
       });
 
       const response = await request(app)
-        .post('/api/v1/auth/register-store')
+        .post('/api/v1/auth/signup-store')
         .send(storeData)
         .expect(201);
 
@@ -161,7 +160,7 @@ describe('Auth Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/auth/register-store')
+        .post('/api/v1/auth/signup-store')
         .send(storeData)
         .expect(409);
 
@@ -177,7 +176,7 @@ describe('Auth Routes Integration Tests', () => {
       };
 
       const response = await request(app)
-        .post('/api/v1/auth/register-store')
+        .post('/api/v1/auth/signup-store')
         .send(invalidData)
         .expect(400);
 

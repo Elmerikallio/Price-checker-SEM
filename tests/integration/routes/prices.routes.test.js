@@ -30,7 +30,7 @@ describe('Prices Routes Integration Tests', () => {
     storeToken = AuthHelpers.generateStoreToken(testStore.id);
   });
 
-  describe('POST /api/v1/prices/observe', () => {
+  describe('POST /api/v1/prices/observations', () => {
     test('should submit price observation successfully', async () => {
       const priceData = MockData.generatePriceObservation({
         barcode: testProduct.barcode,
@@ -38,7 +38,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(priceData)
         .expect(201);
 
@@ -55,7 +55,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(newProductData)
         .expect(201);
 
@@ -66,11 +66,11 @@ describe('Prices Routes Integration Tests', () => {
     test('should validate required fields', async () => {
       const invalidData = {
         // Missing required fields
-        price: 9.99
+        amount: 9.99
       };
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(invalidData)
         .expect(400);
 
@@ -84,7 +84,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(invalidBarcode)
         .expect(400);
 
@@ -98,7 +98,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(invalidLocation)
         .expect(400);
 
@@ -107,11 +107,11 @@ describe('Prices Routes Integration Tests', () => {
 
     test('should validate price value', async () => {
       const invalidPrice = MockData.generatePriceObservation({
-        price: -1 // Negative price
+        amount: -1 // Negative price
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(invalidPrice)
         .expect(400);
 
@@ -123,7 +123,7 @@ describe('Prices Routes Integration Tests', () => {
     beforeEach(async () => {
       // Create test prices at different locations
       await DatabaseHelpers.createTestPrice(testProduct.id, testStore.id, {
-        price: 9.99,
+        amount: 9.99,
         latitude: 60.4518,
         longitude: 22.2666
       });
@@ -135,7 +135,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       await DatabaseHelpers.createTestPrice(testProduct.id, anotherStore.id, {
-        price: 10.49,
+        amount: 10.49,
         latitude: 60.4600,
         longitude: 22.2800
       });
@@ -145,7 +145,7 @@ describe('Prices Routes Integration Tests', () => {
       const response = await request(app)
         .get('/api/v1/prices/nearby')
         .query({
-          gtin: testProduct.barcode,
+          barcode: testProduct.barcode,
           lat: '60.4518',
           lng: '22.2666',
           radius: '5'
@@ -162,7 +162,7 @@ describe('Prices Routes Integration Tests', () => {
       const response = await request(app)
         .get('/api/v1/prices/nearby')
         .query({
-          gtin: testProduct.barcode,
+          barcode: testProduct.barcode,
           lat: '60.4518',
           lng: '22.2666',
           radius: '10'
@@ -183,7 +183,7 @@ describe('Prices Routes Integration Tests', () => {
       const response = await request(app)
         .get('/api/v1/prices/nearby')
         .query({
-          gtin: testProduct.barcode,
+          barcode: testProduct.barcode,
           lat: '60.4518',
           lng: '22.2666',
           radius: '0.1' // Very small radius
@@ -200,7 +200,7 @@ describe('Prices Routes Integration Tests', () => {
       const response = await request(app)
         .get('/api/v1/prices/nearby')
         .query({
-          gtin: '0000000000000',
+          barcode: '0000000000000',
           lat: '60.4518',
           lng: '22.2666'
         })
@@ -226,7 +226,7 @@ describe('Prices Routes Integration Tests', () => {
       const response = await request(app)
         .get('/api/v1/prices/nearby')
         .query({
-          gtin: testProduct.barcode,
+          barcode: testProduct.barcode,
           lat: '91', // Invalid latitude
           lng: '22.2666'
         })
@@ -243,13 +243,13 @@ describe('Prices Routes Integration Tests', () => {
           {
             barcode: testProduct.barcode,
             barcodeType: testProduct.barcodeType,
-            price: 8.99,
+            amount: 8.99,
             productName: 'Updated Product Name'
           },
           {
             barcode: '9876543210987',
             barcodeType: 'EAN13',
-            price: 12.99,
+            amount: 12.99,
             productName: 'Another Product'
           }
         ]
@@ -271,7 +271,7 @@ describe('Prices Routes Integration Tests', () => {
         prices: [{
           barcode: testProduct.barcode,
           barcodeType: testProduct.barcodeType,
-          price: 8.99
+          amount: 8.99
         }]
       };
 
@@ -288,7 +288,7 @@ describe('Prices Routes Integration Tests', () => {
         prices: Array(1001).fill().map((_, index) => ({
           barcode: `123456789${index.toString().padStart(4, '0')}`,
           barcodeType: 'EAN13',
-          price: 9.99
+          amount: 9.99
         }))
       };
 
@@ -309,7 +309,7 @@ describe('Prices Routes Integration Tests', () => {
       const priceData = MockData.generatePriceObservation();
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(priceData);
 
       expect([200, 201, 400, 500]).toContain(response.status);
@@ -318,7 +318,7 @@ describe('Prices Routes Integration Tests', () => {
 
     test('should handle malformed JSON', async () => {
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .set('Content-Type', 'application/json')
         .send('{ invalid json }')
         .expect(400);
@@ -333,7 +333,7 @@ describe('Prices Routes Integration Tests', () => {
       });
 
       const response = await request(app)
-        .post('/api/v1/prices/observe')
+        .post('/api/v1/prices/observations')
         .send(preciseLocation);
 
       expect([200, 201, 400]).toContain(response.status);
@@ -344,7 +344,7 @@ describe('Prices Routes Integration Tests', () => {
     test('should handle multiple concurrent requests', async () => {
       const requests = Array(10).fill().map((_, index) => 
         request(app)
-          .post('/api/v1/prices/observe')
+          .post('/api/v1/prices/observations')
           .send(MockData.generatePriceObservation({
             barcode: `123456789${index.toString().padStart(4, '0')}`
           }))

@@ -1,1 +1,22 @@
-/**\n * Jest Configuration\n */\n\nmodule.exports = {\n  testEnvironment: 'node',\n  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],\n  testMatch: ['<rootDir>/tests/**/*.test.js'],\n  collectCoverageFrom: [\n    'src/**/*.js',\n    '!src/server.js',\n    '!src/app.js', \n    '!src/db/index.js',\n    '!src/config/**'\n  ],\n  coverageDirectory: 'coverage',\n  coverageReporters: ['text', 'lcov', 'html'],\n  testTimeout: 30000,\n  verbose: true,\n  \n  // Transform ES modules to CommonJS for Jest\n  transform: {\n    '^.+\\\\.js$': 'babel-jest'\n  },\n  \n  // Mock ES modules\n  moduleNameMapping: {\n    '^(\\\\.{1,2}/.*)\\\\.js$': '$1'\n  }\n};\n
+export default {
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  testMatch: [
+    '**/tests/**/*.test.js',
+    '**/tests/**/*.spec.js'
+  ],
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/server.js',
+    '!src/config/**',
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov', 'html'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  verbose: true
+};

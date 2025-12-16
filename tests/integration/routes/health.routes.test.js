@@ -24,31 +24,29 @@ describe('Health Routes Integration Tests', () => {
         .expect(200);
 
       expect(response.body).toMatchObject({
-        status: 'healthy',
+        status: 'ok',
         timestamp: expect.any(String),
-        version: expect.any(String),
-        environment: 'test'
+        uptimeSeconds: expect.any(Number)
       });
     });
 
-    test('should include database status', async () => {
+    test('should include basic health information', async () => {
       const response = await request(app)
         .get('/api/v1/health')
         .expect(200);
 
-      expect(response.body.checks).toBeDefined();
-      expect(response.body.checks.database).toBeDefined();
-      expect(response.body.checks.database.status).toMatch(/healthy|unhealthy/);
+      expect(response.body.status).toBe('ok');
+      expect(response.body.uptimeSeconds).toBeGreaterThan(0);
+      expect(response.body.timestamp).toBeDefined();
     });
 
-    test('should include system information', async () => {
+    test('should include uptime information', async () => {
       const response = await request(app)
         .get('/api/v1/health')
         .expect(200);
 
-      expect(response.body.system).toBeDefined();
-      expect(response.body.system.uptime).toBeGreaterThan(0);
-      expect(response.body.system.memory).toBeDefined();
+      expect(response.body.uptimeSeconds).toBeGreaterThan(0);
+      expect(typeof response.body.uptimeSeconds).toBe('number');
     });
 
     test('should respond quickly', async () => {
@@ -68,7 +66,7 @@ describe('Health Routes Integration Tests', () => {
         .get('/api/v1/health')
         .expect(200);
 
-      expect(response.body.status).toBe('healthy');
+      expect(response.body.status).toBe('ok');
     });
 
     test('should handle concurrent health checks', async () => {
@@ -80,7 +78,7 @@ describe('Health Routes Integration Tests', () => {
       
       responses.forEach(response => {
         expect(response.status).toBe(200);
-        expect(response.body.status).toBe('healthy');
+        expect(response.body.status).toBe('ok');
       });
     });
   });

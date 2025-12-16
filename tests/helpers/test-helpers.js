@@ -34,10 +34,7 @@ export class DatabaseHelpers {
     const userData = {
       email: 'testuser@example.com',
       password: '$2b$04$hash', // Pre-hashed test password
-      firstName: 'Test',
-      lastName: 'User',
       role: 'ADMIN',
-      isActive: true,
       ...overrides
     };
 
@@ -52,13 +49,9 @@ export class DatabaseHelpers {
       name: 'Test Store',
       email: 'teststore@example.com',
       password: '$2b$04$hash',
-      status: 'APPROVED',
+      status: 'ACTIVE',
       latitude: 60.4518,
       longitude: 22.2666,
-      address: '123 Test Street',
-      phone: '+358401234567',
-      website: 'https://teststore.com',
-      isActive: true,
       ...overrides
     };
 
@@ -73,7 +66,6 @@ export class DatabaseHelpers {
       barcode: '1234567890128',
       barcodeType: 'EAN13',
       name: 'Test Product',
-      category: 'test',
       ...overrides
     };
 
@@ -87,7 +79,7 @@ export class DatabaseHelpers {
     const priceData = {
       productId,
       storeId,
-      price: 9.99,
+      amount: 9.99,
       source: 'STORE_USER',
       latitude: 60.4518,
       longitude: 22.2666,
@@ -206,7 +198,7 @@ export class MockData {
     return {
       barcode: '1234567890128',
       barcodeType: 'EAN13',
-      price: 9.99,
+      amount: 9.99,
       latitude: 60.4518,
       longitude: 22.2666,
       productName: 'Test Product',
