@@ -39,7 +39,7 @@ router.use(requireAdmin);
  *         schema:
  *           type: string
  *           enum: [PENDING, ACTIVE, LOCKED, REJECTED]
- *         description: Filter stores by user status
+ *         description: Filter stores by status
  *       - in: query
  *         name: page
  *         schema:

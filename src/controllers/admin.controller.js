@@ -190,7 +190,7 @@ export async function lockStoreUser(req, res, next) {
         details: {
           storeName: store.name,
           storeEmail: store.email,
-          suspendedBy: adminUser.email,
+          lockedBy: adminUser.email,
           reason: reason
         },
         ipAddress: req.ip,
@@ -198,11 +198,11 @@ export async function lockStoreUser(req, res, next) {
       }
     });
 
-    logger.info('Store suspended:', { storeId: storeId, suspendedBy: adminUser.email, reason });
+    logger.info('Store locked:', { storeId: storeId, lockedBy: adminUser.email, reason });
 
     res.json({
       success: true,
-      message: 'Store suspended successfully',
+      message: 'Store locked successfully',
       store: updatedStore
     });
 

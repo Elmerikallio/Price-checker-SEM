@@ -136,6 +136,11 @@ const swaggerOptions = {
               type: 'integer',
               description: 'Associated user ID'
             },
+            status: {
+              type: 'string',
+              enum: ['PENDING', 'ACTIVE', 'LOCKED', 'REJECTED'],
+              description: 'Store status'
+            },
             createdAt: {
               type: 'string',
               format: 'date-time'

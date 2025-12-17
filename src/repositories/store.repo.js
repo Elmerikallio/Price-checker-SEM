@@ -229,7 +229,7 @@ export async function getAllStores(options = {}) {
 /**
  * Update store status (for admin approval)
  * @param {number} id - Store ID
- * @param {string} status - New status (APPROVED, REJECTED, SUSPENDED)
+ * @param {string} status - New status (APPROVED, REJECTED, LOCKED)
  * @returns {Promise<Object>} Updated store
  */
 export async function updateStoreStatus(id, status) {
