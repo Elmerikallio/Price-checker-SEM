@@ -252,20 +252,45 @@ export async function updateStoreStatus(id, status) {
 }
 
 /**
- * Delete store (soft delete)
+ * Delete store (permanently)
  * @param {number} id - Store ID
- * @returns {Promise<Object>} Updated store
+ * @returns {Promise<Object>} Deleted store data
  */
 export async function deleteStore(id) {
   try {
-    return await prisma.store.update({
-      where: { id },
-      data: { status: 'INACTIVE' },
-      select: {
-        id: true,
-        name: true,
-        status: true
-      }
+    // First get the store data before deletion
+    const store = await prisma.store.findUnique({
+      where: { id }
+    });
+
+    if (!store) {
+      throw new Error('Store not found');
+    }
+
+    // Delete in transaction to ensure data consistency
+    return await prisma.$transaction(async (tx) => {
+      // Delete all related prices first
+      await tx.price.deleteMany({
+        where: { storeId: id }
+      });
+
+      // Delete all related discounts
+      await tx.discount.deleteMany({
+        where: { storeId: id }
+      });
+
+      // Delete the store (this is the store user account)
+      await tx.store.delete({
+        where: { id }
+      });
+
+      return {
+        id: store.id,
+        name: store.name,
+        status: 'DELETED',
+        email: store.email,
+        deletedAt: new Date()
+      };
     });
   } catch (error) {
     logger.error('Error deleting store:', error);
