@@ -27,7 +27,9 @@
     "deploy:dev": "./scripts/deploy.sh development",
     "deploy:prod": "./scripts/deploy.sh production",
     "logs": "docker-compose logs -f",
-    "health": "curl -k https://localhost/api/v1/health || curl http://localhost:3000/api/v1/health"
+    "health": "curl -k https://localhost/api/v1/health || curl http://localhost:3000/api/v1/health",
+    "docs:verify": "node scripts/verify-swagger.js",
+    "docs:open": "start http://localhost:3000/api-docs"
   },
   "repository": {
     "type": "git",

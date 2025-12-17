@@ -239,33 +239,66 @@ MAX_SEARCH_RADIUS_KM=50
 
 ## 📚 API Documentation
 
-### Base URL
+### 🌐 Interactive Swagger Documentation
+**✨ Complete OpenAPI 3.0 documentation with interactive testing interface**
+
+- **Swagger UI**: http://localhost:3000/api-docs
+- **OpenAPI JSON**: http://localhost:3000/api-docs.json
+- **API Root**: http://localhost:3000/api
+
+### 📋 Quick Access
+```bash
+# Open Swagger UI in browser
+npm run docs:open
+
+# Verify documentation
+npm run docs:verify
+```
+
+### 🎯 Functional Requirements Coverage
+All functional requirements are fully documented and testable:
+
+**✅ User Management**
+- `GET /admin/stores` - Review store sign-up requests
+- `POST /admin/stores/{id}/approve` - Approve store users
+- `POST /admin/stores/{id}/suspend` - Lock store accounts
+- `POST /admin/stores/{id}/reactivate` - Unlock store accounts
+- `DELETE /admin/stores/{id}` - Remove store accounts
+- `POST /admin/users` - Create admin accounts
+
+**✅ Store Discount Management**
+- `POST /prices/products` - Store users add products with app-exclusive discounts
+- `GET /prices/nearby` - Backend considers discounts in price comparison
+
+**✅ Location-Store Mapping**
+- `POST /auth/signup-store` - Store location provided during signup
+- `GET /stores` - Location-store list maintenance
+
+**✅ Price Comparison System**
+- `GET /prices/nearby` - Compare prices across nearby stores with labels
+- `POST /prices/observations` - Submit price observations with barcode/location data
+- Returns sorted price list with store info and price categories
+
+**✅ Batch Operations**
+- `POST /prices/batch` - Store users bulk upload price lists
+
+**✅ Security & Auditing**
+- JWT authentication with role-based access
+- `GET /admin/audit-logs` - Complete admin operation logging
+- HTTPS-ready deployment configuration
+
+### 📊 API Features
+- **Authentication**: JWT Bearer token with role-based access (SUPER_ADMIN, ADMIN, STORE_USER)
+- **Validation**: Comprehensive Zod schemas for all endpoints
+- **Geographic Search**: Coordinate-based store/price filtering
+- **Error Handling**: Standardized error responses
+- **Pagination**: Consistent pagination across list endpoints
+- **Versioning**: `/api/v1` prefix for future compatibility
+
+### 🔗 Base URL
 ```
 http://localhost:3000/api/v1
 ```
-
-### Authentication Endpoints
-- `POST /auth/login` - User/Store login
-- `POST /auth/stores/signup` - Store registration
-- `POST /auth/logout` - Logout (JWT invalidation)
-
-### Price Management
-- `GET /prices/product/:barcode` - Get prices for product
-- `POST /prices/observe` - Report price observation
-- `GET /prices/nearby` - Get nearby store prices
-
-### Store Management  
-- `GET /stores` - List approved stores
-- `GET /stores/nearby` - Find stores by location
-- `PUT /stores/profile` - Update store profile
-
-### Admin Operations
-- `GET /admin/stores` - Manage store approvals
-- `PUT /admin/stores/:id/status` - Approve/reject stores
-- `GET /admin/audit` - View audit logs
-
-### Health Check
-- `GET /health` - Service health status
 
 ## 🔐 Security Features
 
