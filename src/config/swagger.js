@@ -98,7 +98,7 @@ const swaggerOptions = {
             },
             status: {
               type: 'string',
-              enum: ['PENDING', 'ACTIVE', 'SUSPENDED', 'REJECTED'],
+              enum: ['PENDING', 'ACTIVE', 'LOCKED', 'REJECTED'],
               description: 'User account status'
             },
             createdAt: {
