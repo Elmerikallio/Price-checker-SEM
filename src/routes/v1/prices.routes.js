@@ -4,11 +4,12 @@ import {
   submitObservation,
   getProductPriceHistory,
   getStorePrices,
-  submitBatchObservations
+  submitBatchObservations,
+  submitProductPriceList
 } from "../../controllers/prices.controller.js";
 import { requireAuth, requireStore, optionalAuth } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
-import { priceObservationSchema } from "../../schemas/prices.schema.js";
+import { priceObservationSchema, storeProductPriceSchema } from "../../schemas/prices.schema.js";
 
 const router = Router();
 
@@ -27,5 +28,6 @@ router.post("/observations",
 // Store-only routes
 router.get("/store/prices", requireStore, getStorePrices);
 router.post("/batch", requireStore, submitBatchObservations);
+router.post("/products", requireStore, validate(storeProductPriceSchema), submitProductPriceList);
 
 export default router;

@@ -100,6 +100,7 @@ export async function getNearbyPrices(req, res, next) {
             lat: parseFloat(price.store.latitude),
             lng: parseFloat(price.store.longitude)
           },
+          address: price.store.address,
           distance: price.distance
         },
         product: {
@@ -120,6 +121,9 @@ export async function getNearbyPrices(req, res, next) {
         }))
       };
     });
+
+    // Sort results by price in ascending order (cheapest first)
+    results.sort((a, b) => a.price - b.price);
 
     res.json({
       success: true,
@@ -374,6 +378,117 @@ export async function submitBatchObservations(req, res, next) {
       success: true,
       message: `Batch processing completed. ${processed} observations processed.`,
       processed,
+      errors: errors.length > 0 ? errors : undefined
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Submit enhanced product-price information objects (Store-only)
+ * Handles barcode data, location, price, and timestamp
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+export async function submitProductPriceList(req, res, next) {
+  try {
+    const { user } = req;
+    const { products } = req.body;
+
+    if (user.type !== 'store') {
+      throw new HttpError(403, 'Store authentication required');
+    }
+
+    let processed = 0;
+    let errors = [];
+    const results = [];
+
+    for (const product of products) {
+      try {
+        // Create the price observation with enhanced data structure
+        const priceObservation = await createPriceObservation({
+          barcode: product.barcode,
+          barcodeType: product.barcodeType,
+          productName: product.productName,
+          price: product.price,
+          currency: product.currency || 'EUR',
+          latitude: product.latitude,
+          longitude: product.longitude,
+          source: 'STORE_API',
+          storeId: user.storeId,
+          confidence: 1.0,
+          metadata: {
+            gtin: product.gtin,
+            timestamp: product.timestamp,
+            productCategory: product.productCategory,
+            brand: product.brand,
+            source: product.source,
+            notes: product.notes
+          }
+        });
+
+        processed++;
+        results.push({
+          id: priceObservation.id,
+          product: {
+            barcode: product.barcode,
+            barcodeType: product.barcodeType,
+            gtin: product.gtin,
+            name: product.productName
+          },
+          price: product.price,
+          currency: product.currency || 'EUR',
+          location: {
+            latitude: product.latitude,
+            longitude: product.longitude
+          },
+          timestamp: product.timestamp,
+          status: 'processed'
+        });
+
+        // Log the activity
+        await prisma.auditLog.create({
+          data: {
+            storeId: user.storeId,
+            action: 'PRICE_BATCH_UPLOAD',
+            resource: 'Price',
+            details: {
+              productBarcode: product.barcode,
+              gtin: product.gtin,
+              price: product.price,
+              currency: product.currency,
+              source: product.source
+            },
+            ipAddress: req.ip,
+            userAgent: req.get('User-Agent')
+          }
+        });
+
+      } catch (error) {
+        logger.error('Error processing product price:', {
+          product,
+          error: error.message,
+          storeId: user.storeId
+        });
+
+        errors.push({
+          product,
+          error: error.message
+        });
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Product price batch processed. ${processed} items processed successfully.`,
+      summary: {
+        total: products.length,
+        processed,
+        errors: errors.length
+      },
+      results,
       errors: errors.length > 0 ? errors : undefined
     });
 

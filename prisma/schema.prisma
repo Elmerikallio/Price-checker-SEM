@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -153,6 +153,8 @@ enum AuditAction {
   STORE_UPDATED
   LOGIN_SUCCESS
   LOGIN_FAILED
+  PRICE_REPORTED
+  PRICE_BATCH_UPLOAD
 }
 
 enum AuditTargetType {

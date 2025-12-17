@@ -82,6 +82,16 @@ $token = $response.token
 Write-Host "Admin Token: $token"
 
 
+
+## new admin token admin token:
+$loginData = '{"email":"admin@pricechecker.com","password":"admin123"}'
+$response = Invoke-RestMethod -Uri "http://localhost:3000/api/v1/auth/login" -Method POST -ContentType "application/json" -Body $loginData
+$token = $response.token
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBwcmljZWNoZWNrZXIuY29tIiwidHlwZSI6InVzZXIiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NjU5NTcxNDcsImV4cCI6MTc2NjA0MzU0N30.810qKeYUsJCXUNl1Dmsb2NX3YqpDjXmWU5UZuFUntCc
+
+
 2. Create Test Store Signups
 
 # Create first test store
