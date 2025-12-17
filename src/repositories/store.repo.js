@@ -38,13 +38,13 @@ export async function findStoreByEmail(email) {
 
 /**
  * Find store by ID
- * @param {string} id 
+ * @param {number} id 
  * @returns {Promise<Object|null>} Store object or null
  */
 export async function findStoreById(id) {
   try {
     return await prisma.store.findUnique({
-      where: { id },
+      where: { id: parseInt(id, 10) },
       select: {
         id: true,
         name: true,
@@ -229,14 +229,14 @@ export async function getAllStores(options = {}) {
 
 /**
  * Update store status (for admin approval)
- * @param {string} id - Store ID
+ * @param {number} id - Store ID
  * @param {string} status - New status (APPROVED, REJECTED, SUSPENDED)
  * @returns {Promise<Object>} Updated store
  */
 export async function updateStoreStatus(id, status) {
   try {
     return await prisma.store.update({
-      where: { id },
+      where: { id: parseInt(id, 10) },
       data: { status },
       select: {
         id: true,
@@ -254,13 +254,13 @@ export async function updateStoreStatus(id, status) {
 
 /**
  * Delete store (soft delete)
- * @param {string} id - Store ID
+ * @param {number} id - Store ID
  * @returns {Promise<Object>} Updated store
  */
 export async function deleteStore(id) {
   try {
     return await prisma.store.update({
-      where: { id },
+      where: { id: parseInt(id, 10) },
       data: { status: 'INACTIVE' },
       select: {
         id: true,

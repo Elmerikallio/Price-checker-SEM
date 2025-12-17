@@ -23,18 +23,23 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Username or email address
- *                 example: "store_user@example.com"
+ *                 description: User email address
+ *                 example: "admin@pricechecker.com"
  *               password:
  *                 type: string
  *                 format: password
  *                 description: User password
- *                 example: "securePassword123"
+ *                 example: "admin123"
+ *               userType:
+ *                 type: string
+ *                 description: Account type (optional, defaults to 'user')
+ *                 enum: [user, store]
+ *                 example: "user"
  *     responses:
  *       200:
  *         description: Login successful

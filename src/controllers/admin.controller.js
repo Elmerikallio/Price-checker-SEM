@@ -54,7 +54,13 @@ export async function approveStoreUser(req, res, next) {
     const { id } = req.params;
     const adminUser = req.user;
 
-    const store = await findStoreById(id);
+    // Convert id to integer
+    const storeId = parseInt(id, 10);
+    if (isNaN(storeId) || storeId <= 0) {
+      throw new HttpError(400, 'Invalid store ID');
+    }
+
+    const store = await findStoreById(storeId);
     if (!store) {
       throw new HttpError(404, 'Store not found');
     }
@@ -63,13 +69,13 @@ export async function approveStoreUser(req, res, next) {
       throw new HttpError(400, 'Store is already approved');
     }
 
-    const updatedStore = await updateStoreStatus(id, 'APPROVED');
+    const updatedStore = await updateStoreStatus(storeId, 'APPROVED');
 
     // Log the approval action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: id,
+        storeId: storeId,
         action: 'STORE_APPROVED',
         resource: 'Store',
         details: {
@@ -106,18 +112,24 @@ export async function rejectStoreUser(req, res, next) {
     const { reason } = req.body;
     const adminUser = req.user;
 
-    const store = await findStoreById(id);
+    // Convert id to integer
+    const storeId = parseInt(id, 10);
+    if (isNaN(storeId) || storeId <= 0) {
+      throw new HttpError(400, 'Invalid store ID');
+    }
+
+    const store = await findStoreById(storeId);
     if (!store) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const updatedStore = await updateStoreStatus(id, 'REJECTED');
+    const updatedStore = await updateStoreStatus(storeId, 'REJECTED');
 
     // Log the rejection action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: id,
+        storeId: storeId,
         action: 'STORE_REJECTED',
         resource: 'Store',
         details: {
@@ -155,18 +167,24 @@ export async function lockStoreUser(req, res, next) {
     const { reason } = req.body;
     const adminUser = req.user;
 
-    const store = await findStoreById(id);
+    // Convert id to integer
+    const storeId = parseInt(id, 10);
+    if (isNaN(storeId) || storeId <= 0) {
+      throw new HttpError(400, 'Invalid store ID');
+    }
+
+    const store = await findStoreById(storeId);
     if (!store) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const updatedStore = await updateStoreStatus(id, 'SUSPENDED');
+    const updatedStore = await updateStoreStatus(storeId, 'SUSPENDED');
 
     // Log the suspension action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: id,
+        storeId: storeId,
         action: 'STORE_SUSPENDED',
         resource: 'Store',
         details: {
@@ -180,7 +198,7 @@ export async function lockStoreUser(req, res, next) {
       }
     });
 
-    logger.info('Store suspended:', { storeId: id, suspendedBy: adminUser.email, reason });
+    logger.info('Store suspended:', { storeId: storeId, suspendedBy: adminUser.email, reason });
 
     res.json({
       success: true,
@@ -203,18 +221,24 @@ export async function unlockStoreUser(req, res, next) {
     const { id } = req.params;
     const adminUser = req.user;
 
-    const store = await findStoreById(id);
+    // Convert id to integer
+    const storeId = parseInt(id, 10);
+    if (isNaN(storeId) || storeId <= 0) {
+      throw new HttpError(400, 'Invalid store ID');
+    }
+
+    const store = await findStoreById(storeId);
     if (!store) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const updatedStore = await updateStoreStatus(id, 'APPROVED');
+    const updatedStore = await updateStoreStatus(storeId, 'APPROVED');
 
     // Log the reactivation action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: id,
+        storeId: storeId,
         action: 'STORE_REACTIVATED',
         resource: 'Store',
         details: {
@@ -227,7 +251,7 @@ export async function unlockStoreUser(req, res, next) {
       }
     });
 
-    logger.info('Store reactivated:', { storeId: id, reactivatedBy: adminUser.email });
+    logger.info('Store reactivated:', { storeId: storeId, reactivatedBy: adminUser.email });
 
     res.json({
       success: true,
@@ -250,18 +274,24 @@ export async function removeStoreUser(req, res, next) {
     const { id } = req.params;
     const adminUser = req.user;
 
-    const store = await findStoreById(id);
+    // Convert id to integer
+    const storeId = parseInt(id, 10);
+    if (isNaN(storeId) || storeId <= 0) {
+      throw new HttpError(400, 'Invalid store ID');
+    }
+
+    const store = await findStoreById(storeId);
     if (!store) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const deletedStore = await deleteStore(id);
+    const deletedStore = await deleteStore(storeId);
 
     // Log the deletion action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: id,
+        storeId: storeId,
         action: 'STORE_DELETED',
         resource: 'Store',
         details: {
