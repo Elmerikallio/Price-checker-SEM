@@ -209,7 +209,7 @@ DATABASE_URL="mysql://username:password@localhost:3306/price_checker"
 
 # Authentication
 JWT_SECRET="your-super-secure-jwt-secret-key"
-JWT_EXPIRE_TIME="24h"
+JWT_EXPIRES_IN="24h"
 BCRYPT_ROUNDS=10
 
 # Application

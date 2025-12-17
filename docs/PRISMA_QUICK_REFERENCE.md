@@ -190,7 +190,7 @@ DATABASE_URL="mysql://user:pass@localhost:3306/price_checker"
 JWT_SECRET="your-super-secure-secret"
 
 # Optional
-JWT_EXPIRE_TIME="24h"
+JWT_EXPIRES_IN="24h"
 BCRYPT_ROUNDS=10
 NODE_ENV="development"
 PORT=3000

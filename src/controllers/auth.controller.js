@@ -15,7 +15,7 @@ function generateToken(payload) {
   return jwt.sign(
     payload,
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE_TIME || '24h' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
 }
 
