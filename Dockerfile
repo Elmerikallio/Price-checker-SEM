@@ -3,10 +3,20 @@
 # Development stage
 FROM node:20-alpine AS development
 WORKDIR /app
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Install dependencies
 COPY package*.json ./
 RUN npm ci
+
+# Copy source code
 COPY . .
+
+# Generate Prisma client
 RUN npx prisma generate
+
 EXPOSE 3000 9229
 CMD ["npm", "run", "dev"]
 

@@ -7,12 +7,12 @@ services:
       target: development
     volumes:
       - .:/app
-      - /app/node_modules
+      - node_modules_cache:/app/node_modules
     environment:
       - NODE_ENV=development
       - LOG_LEVEL=debug
       - DATABASE_URL=mysql://app_user:app_password@mysql:3306/price_checker
-    command: npm run dev
+    command: sh -c "npm ci && npm run dev"
     ports:
       - "3000:3000"
       - "9229:9229" # Debug port
@@ -55,3 +55,4 @@ networks:
 
 volumes:
   mysql_dev_data:
+  node_modules_cache:
