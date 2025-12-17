@@ -42,10 +42,8 @@ export async function findUserById(id) {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
         role: true,
-        id: true,
+        createdBy: true,
         createdAt: true,
         updatedAt: true
       }
@@ -68,10 +66,8 @@ export async function createUser(userData) {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
         role: true,
-        id: true,
+        createdBy: true,
         createdAt: true
       }
     });
@@ -95,10 +91,8 @@ export async function updateUser(id, updateData) {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
         role: true,
-        id: true,
+        createdBy: true,
         updatedAt: true
       }
     });
@@ -123,10 +117,8 @@ export async function getAllUsers(skip = 0, take = 10) {
         select: {
           id: true,
           email: true,
-          firstName: true,
-          lastName: true,
           role: true,
-          id: true,
+          createdBy: true,
           createdAt: true
         },
         orderBy: {

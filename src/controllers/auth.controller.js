@@ -149,6 +149,9 @@ export async function registerStoreSignup(req, res, next) {
       name,
       email,
       password: hashedPassword,
+      address,
+      phone,
+      website,
       latitude,
       longitude,
       status: 'PENDING'

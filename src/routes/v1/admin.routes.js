@@ -7,13 +7,17 @@ import {
   unlockStoreUser,
   removeStoreUser,
   getAuditLogs,
-  getSystemStats
+  getSystemStats,
+  createAdminUser
 } from "../../controllers/admin.controller.js";
-import { requireAdmin, requireSuperAdmin } from "../../middleware/auth.js";
+import { requireAuth, requireAdmin, requireSuperAdmin } from "../../middleware/auth.js";
+import { validate } from "../../middleware/validate.js";
+import { createUserSchema } from "../../schemas/auth.schema.js";
 
 const router = Router();
 
-// All admin routes require admin authentication
+// All admin routes require authentication first, then admin role check
+router.use(requireAuth);
 router.use(requireAdmin);
 
 // Store management
@@ -25,6 +29,7 @@ router.post("/stores/:id/reactivate", unlockStoreUser);
 
 // Super admin only routes
 router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
+router.post("/users", requireSuperAdmin, validate(createUserSchema), createAdminUser);
 
 // Audit and statistics
 router.get("/audit-logs", getAuditLogs);

@@ -4,10 +4,11 @@ import {
   findStoreById,
   deleteStore 
 } from '../repositories/store.repo.js';
-import { getAllUsers, updateUser, deleteUser } from '../repositories/user.repo.js';
+import { getAllUsers, updateUser, deleteUser, createUser, findUserByEmail } from '../repositories/user.repo.js';
 import { prisma } from '../db/prisma.js';
 import { logger } from '../utils/logger.js';
 import { HttpError } from '../utils/httpError.js';
+import bcrypt from 'bcrypt';
 
 /**
  * Get all stores for admin management
@@ -414,6 +415,75 @@ export async function getSystemStats(req, res, next) {
           lastDay: recentPrices
         }
       }
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Create a new admin user
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+export async function createAdminUser(req, res, next) {
+  try {
+    const { email, password, role = 'ADMIN' } = req.body;
+    const adminUser = req.user;
+
+    // Validate role
+    if (!['ADMIN', 'SUPER_ADMIN'].includes(role)) {
+      throw new HttpError(400, 'Invalid role. Must be ADMIN or SUPER_ADMIN');
+    }
+
+    // Check if user already exists
+    const existingUser = await findUserByEmail(email);
+    if (existingUser) {
+      throw new HttpError(409, 'User with this email already exists');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the new admin user
+    const newUser = await createUser({
+      email,
+      password: hashedPassword,
+      role,
+      isActive: true
+    });
+
+    // Log the creation action
+    await prisma.auditLog.create({
+      data: {
+        userId: adminUser.id,
+        action: 'ADMIN_USER_CREATED',
+        resource: 'User',
+        details: {
+          newUserEmail: email,
+          newUserRole: role,
+          createdBy: adminUser.email
+        },
+        ipAddress: req.ip,
+        userAgent: req.get('User-Agent')
+      }
+    });
+
+    logger.info('Admin user created:', { 
+      newUserId: newUser.id, 
+      newUserEmail: email, 
+      role,
+      createdBy: adminUser.email 
+    });
+
+    // Remove password from response
+    const { password: _, ...userResponse } = newUser;
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin user created successfully',
+      user: userResponse
     });
 
   } catch (error) {

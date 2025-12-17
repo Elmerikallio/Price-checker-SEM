@@ -26,7 +26,6 @@ export async function findStoreByEmail(email) {
         phone: true,
         website: true,
         status: true,
-        id: true,
         createdAt: true,
         updatedAt: true
       }

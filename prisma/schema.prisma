@@ -30,6 +30,9 @@ model Store {
   name      String      // Store display name
   email     String      @unique
   password  String      // Hashed password
+  address   String?     // Store address
+  phone     String?     // Store phone number
+  website   String?     // Store website URL
   status    StoreStatus @default(PENDING)
   latitude  Float       // Store location
   longitude Float       // Store location
