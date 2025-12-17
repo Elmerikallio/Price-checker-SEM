@@ -135,9 +135,9 @@ price-checker-sem/
 │   ├── server.js              # 🚀 App entry point
 │   ├── app.js                 # 🏗️ Express app configuration
 │   ├── 📁 config/
-│   │   ├── db.config.js       # ⚙️ Database configuration
 │   │   ├── env.js             # 🌐 Environment variables
-│   │   └── logger.js          # 📝 Logging configuration
+│   │   ├── logger.js          # 📝 Logging configuration
+│   │   └── swagger.js         # 📋 API documentation configuration
 │   ├── 📁 controllers/        # 🎮 Request handlers
 │   │   ├── admin.controller.js
 │   │   ├── auth.controller.js
