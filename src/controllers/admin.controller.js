@@ -65,19 +65,19 @@ export async function approveStoreUser(req, res, next) {
       throw new HttpError(404, 'Store not found');
     }
 
-    if (store.status === 'APPROVED') {
+    if (store.status === 'ACTIVE') {
       throw new HttpError(400, 'Store is already approved');
     }
 
-    const updatedStore = await updateStoreStatus(storeId, 'APPROVED');
+    const updatedStore = await updateStoreStatus(storeId, 'ACTIVE');
 
     // Log the approval action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: storeId,
         action: 'STORE_APPROVED',
-        resource: 'Store',
+        targetType: 'STORE',
+        targetId: storeId.toString(),
         details: {
           storeName: store.name,
           storeEmail: store.email,
@@ -129,9 +129,9 @@ export async function rejectStoreUser(req, res, next) {
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: storeId,
         action: 'STORE_REJECTED',
-        resource: 'Store',
+        targetType: 'STORE',
+        targetId: storeId.toString(),
         details: {
           storeName: store.name,
           storeEmail: store.email,
@@ -143,7 +143,7 @@ export async function rejectStoreUser(req, res, next) {
       }
     });
 
-    logger.info('Store rejected:', { storeId: id, rejectedBy: adminUser.email, reason });
+    logger.info('Store rejected:', { storeId: storeId, rejectedBy: adminUser.email, reason });
 
     res.json({
       success: true,
@@ -178,15 +178,15 @@ export async function lockStoreUser(req, res, next) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const updatedStore = await updateStoreStatus(storeId, 'SUSPENDED');
+    const updatedStore = await updateStoreStatus(storeId, 'LOCKED');
 
     // Log the suspension action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: storeId,
-        action: 'STORE_SUSPENDED',
-        resource: 'Store',
+        action: 'STORE_LOCKED',
+        targetType: 'STORE',
+        targetId: storeId.toString(),
         details: {
           storeName: store.name,
           storeEmail: store.email,
@@ -232,15 +232,15 @@ export async function unlockStoreUser(req, res, next) {
       throw new HttpError(404, 'Store not found');
     }
 
-    const updatedStore = await updateStoreStatus(storeId, 'APPROVED');
+    const updatedStore = await updateStoreStatus(storeId, 'ACTIVE');
 
     // Log the reactivation action
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: storeId,
-        action: 'STORE_REACTIVATED',
-        resource: 'Store',
+        action: 'STORE_UNLOCKED',
+        targetType: 'STORE',
+        targetId: storeId.toString(),
         details: {
           storeName: store.name,
           storeEmail: store.email,
@@ -291,9 +291,9 @@ export async function removeStoreUser(req, res, next) {
     await prisma.auditLog.create({
       data: {
         userId: adminUser.id,
-        storeId: storeId,
         action: 'STORE_DELETED',
-        resource: 'Store',
+        targetType: 'STORE',
+        targetId: storeId.toString(),
         details: {
           storeName: store.name,
           storeEmail: store.email,

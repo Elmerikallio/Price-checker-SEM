@@ -29,7 +29,7 @@ router.use(requireAdmin);
  *       **Functional Requirement**: Backend administrator can review sign-up requests from store users.
  *       
  *       Retrieve all stores with their associated users for administrative review and management.
- *       Shows stores in all statuses (pending, active, suspended, rejected).
+ *       Shows stores in all statuses (pending, active, locked, rejected).
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
@@ -38,7 +38,7 @@ router.use(requireAdmin);
  *         name: status
  *         schema:
  *           type: string
- *           enum: [PENDING, ACTIVE, SUSPENDED, REJECTED]
+ *           enum: [PENDING, ACTIVE, LOCKED, REJECTED]
  *         description: Filter stores by user status
  *       - in: query
  *         name: page
@@ -217,7 +217,7 @@ router.post("/stores/:id/reject", rejectStoreUser);
  *                 example: "Policy violation detected"
  *     responses:
  *       200:
- *         description: Store user suspended successfully
+ *         description: Store user locked successfully
  *         content:
  *           application/json:
  *             schema:
@@ -225,7 +225,7 @@ router.post("/stores/:id/reject", rejectStoreUser);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Store user suspended successfully"
+ *                   example: "Store user locked successfully"
  *       404:
  *         description: Store user not found
  *         content:
@@ -243,7 +243,7 @@ router.post("/stores/:id/suspend", lockStoreUser);
  *     description: |
  *       **Functional Requirement**: Backend administrator can unlock store user accounts.
  *       
- *       Reactivate a suspended store user account, restoring login and API access.
+ *       Reactivate a locked store user account, restoring login and API access.
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
@@ -501,7 +501,7 @@ router.get("/audit-logs", getAuditLogs);
  *                       type: integer
  *                     pending:
  *                       type: integer
- *                     suspended:
+ *                     locked:
  *                       type: integer
  *                 stores:
  *                   type: object

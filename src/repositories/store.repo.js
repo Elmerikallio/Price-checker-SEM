@@ -44,7 +44,7 @@ export async function findStoreByEmail(email) {
 export async function findStoreById(id) {
   try {
     return await prisma.store.findUnique({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       select: {
         id: true,
         name: true,
@@ -55,7 +55,6 @@ export async function findStoreById(id) {
         phone: true,
         website: true,
         status: true,
-        id: true,
         createdAt: true,
         updatedAt: true
       }
@@ -236,7 +235,7 @@ export async function getAllStores(options = {}) {
 export async function updateStoreStatus(id, status) {
   try {
     return await prisma.store.update({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       data: { status },
       select: {
         id: true,
@@ -260,12 +259,12 @@ export async function updateStoreStatus(id, status) {
 export async function deleteStore(id) {
   try {
     return await prisma.store.update({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       data: { status: 'INACTIVE' },
       select: {
         id: true,
         name: true,
-        id: true
+        status: true
       }
     });
   } catch (error) {
