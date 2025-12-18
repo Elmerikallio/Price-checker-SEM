@@ -8,7 +8,9 @@ import {
   removeStoreUser,
   getAuditLogs,
   getSystemStats,
-  createAdminUser
+  createAdminUser,
+  getAllProducts,
+  getItemReport
 } from "../../controllers/admin.controller.js";
 import { requireAuth, requireAdmin, requireSuperAdmin } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
@@ -384,6 +386,117 @@ router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
  *               $ref: '#/components/schemas/Error'
  */
 router.post("/users", createAdminUser);
+
+/**
+ * @swagger
+ * /admin/products:
+ *   get:
+ *     summary: Get all products in the system
+ *     description: |
+ *       **Admin Function**: Get comprehensive list of all products with their associated price data.
+ *       
+ *       Returns all products in the database with price statistics and latest price information.
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *         description: Number of items per page
+ *     responses:
+ *       200:
+ *         description: Products retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       barcode:
+ *                         type: string
+ *                       barcodeType:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       priceCount:
+ *                         type: integer
+ *                       latestPrice:
+ *                         type: number
+ *                       averagePrice:
+ *                         type: number
+ *                       minPrice:
+ *                         type: number
+ *                       maxPrice:
+ *                         type: number
+ *                 pagination:
+ *                   type: object
+ *       403:
+ *         description: Admin access required
+ */
+router.get("/products", getAllProducts);
+
+/**
+ * @swagger
+ * /admin/item-report:
+ *   get:
+ *     summary: Get comprehensive item report
+ *     description: |
+ *       **Admin Function**: Get detailed item report with statistics and analysis.
+ *       
+ *       Returns comprehensive statistics about all products, prices, stores, and system activity.
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Item report generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 report:
+ *                   type: object
+ *                   properties:
+ *                     totalProducts:
+ *                       type: integer
+ *                     totalPrices:
+ *                       type: integer
+ *                     totalStores:
+ *                       type: integer
+ *                     topProducts:
+ *                       type: array
+ *                     recentActivity:
+ *                       type: array
+ *                     priceDistribution:
+ *                       type: object
+ *       403:
+ *         description: Admin access required
+ */
+router.get("/item-report", getItemReport);
 
 /**
  * @swagger

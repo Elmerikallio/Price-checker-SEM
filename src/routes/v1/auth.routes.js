@@ -6,6 +6,8 @@ import {
   getProfile
 } from "../../controllers/auth.controller.js";
 import { requireAuth } from "../../middleware/auth.js";
+import { validate } from "../../middleware/validate.js";
+import { storeSignupSchema } from "../../schemas/auth.schema.js";
 
 const router = Router();
 

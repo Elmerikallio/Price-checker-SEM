@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 
 // Store signup schema
 export const storeSignupSchema = z.object({
-  name: z.string().min(2, 'Store name must be at least 2 characters').max(100, 'Store name too long'),
+  storeName: z.string().min(2, 'Store name must be at least 2 characters').max(100, 'Store name too long'),
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   address: z.string().min(1, 'Address is required').max(200, 'Address too long').optional(),

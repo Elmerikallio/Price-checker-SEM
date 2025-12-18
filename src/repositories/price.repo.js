@@ -88,9 +88,16 @@ export async function findPricesByProduct(barcode, barcodeType, options = {}) {
           barcodeType
         },
         isActive: includeInactive ? undefined : true,
-        store: {
-          status: 'ACTIVE'
-        }
+        OR: [
+          {
+            storeId: null // Shopper submissions have no store
+          },
+          {
+            store: {
+              status: 'ACTIVE'
+            }
+          }
+        ]
       },
       include: {
         product: {

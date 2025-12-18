@@ -520,3 +520,283 @@ export async function createAdminUser(req, res, next) {
     next(error);
   }
 }
+
+/**
+ * Get all products in the system
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+export async function getAllProducts(req, res, next) {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const take = parseInt(limit);
+
+    // Get all products with aggregated price data
+    const products = await prisma.product.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        barcode: true,
+        barcodeType: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            prices: true
+          }
+        },
+        prices: {
+          where: {
+            isActive: true
+          },
+          select: {
+            amount: true,
+            observedAt: true,
+            source: true,
+            store: {
+              select: {
+                name: true
+              }
+            }
+          },
+          orderBy: {
+            observedAt: 'desc'
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Calculate statistics for each product
+    const productsWithStats = products.map(product => {
+      const activePrices = product.prices.map(p => p.amount);
+      const latestPrice = activePrices.length > 0 ? product.prices[0].amount : null;
+      const averagePrice = activePrices.length > 0 
+        ? activePrices.reduce((sum, price) => sum + price, 0) / activePrices.length 
+        : null;
+      const minPrice = activePrices.length > 0 ? Math.min(...activePrices) : null;
+      const maxPrice = activePrices.length > 0 ? Math.max(...activePrices) : null;
+
+      return {
+        id: product.id,
+        barcode: product.barcode,
+        barcodeType: product.barcodeType,
+        name: product.name || `Product ${product.barcode}`,
+        createdAt: product.createdAt,
+        priceCount: product._count.prices,
+        latestPrice,
+        averagePrice: averagePrice ? parseFloat(averagePrice.toFixed(2)) : null,
+        minPrice,
+        maxPrice,
+        recentPrices: product.prices.slice(0, 5).map(p => ({
+          amount: p.amount,
+          observedAt: p.observedAt,
+          source: p.source,
+          storeName: p.store?.name
+        }))
+      };
+    });
+
+    // Get total count for pagination
+    const totalProducts = await prisma.product.count();
+
+    res.json({
+      success: true,
+      products: productsWithStats,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalProducts,
+        totalPages: Math.ceil(totalProducts / parseInt(limit))
+      }
+    });
+
+  } catch (error) {
+    logger.error('Error getting all products:', error);
+    next(error);
+  }
+}
+
+/**
+ * Get comprehensive item report
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ */
+export async function getItemReport(req, res, next) {
+  try {
+    // Get basic counts
+    const [totalProducts, totalPrices, totalStores, totalUsers] = await Promise.all([
+      prisma.product.count(),
+      prisma.price.count({ where: { isActive: true } }),
+      prisma.store.count({ where: { status: 'ACTIVE' } }),
+      prisma.user.count()
+    ]);
+
+    // Get top products by price observation count
+    const topProducts = await prisma.product.findMany({
+      select: {
+        id: true,
+        barcode: true,
+        barcodeType: true,
+        name: true,
+        _count: {
+          select: {
+            prices: {
+              where: { isActive: true }
+            }
+          }
+        },
+        prices: {
+          where: { isActive: true },
+          select: {
+            amount: true,
+            observedAt: true
+          },
+          orderBy: {
+            observedAt: 'desc'
+          },
+          take: 1
+        }
+      },
+      orderBy: {
+        prices: {
+          _count: 'desc'
+        }
+      },
+      take: 10
+    });
+
+    // Get recent price activity (last 24 hours)
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+    const recentActivity = await prisma.price.findMany({
+      where: {
+        isActive: true,
+        createdAt: {
+          gte: twentyFourHoursAgo
+        }
+      },
+      select: {
+        id: true,
+        amount: true,
+        source: true,
+        observedAt: true,
+        createdAt: true,
+        product: {
+          select: {
+            barcode: true,
+            barcodeType: true,
+            name: true
+          }
+        },
+        store: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 20
+    });
+
+    // Get price distribution statistics
+    const allPrices = await prisma.price.findMany({
+      where: { isActive: true },
+      select: { amount: true }
+    });
+
+    const priceAmounts = allPrices.map(p => p.amount);
+    let priceDistribution = null;
+
+    if (priceAmounts.length > 0) {
+      priceAmounts.sort((a, b) => a - b);
+      const min = priceAmounts[0];
+      const max = priceAmounts[priceAmounts.length - 1];
+      const avg = priceAmounts.reduce((sum, price) => sum + price, 0) / priceAmounts.length;
+      const median = priceAmounts.length % 2 === 0
+        ? (priceAmounts[Math.floor(priceAmounts.length / 2) - 1] + priceAmounts[Math.floor(priceAmounts.length / 2)]) / 2
+        : priceAmounts[Math.floor(priceAmounts.length / 2)];
+
+      priceDistribution = {
+        min: parseFloat(min.toFixed(2)),
+        max: parseFloat(max.toFixed(2)),
+        average: parseFloat(avg.toFixed(2)),
+        median: parseFloat(median.toFixed(2)),
+        count: priceAmounts.length
+      };
+    }
+
+    // Get store activity statistics
+    const storeStats = await prisma.store.findMany({
+      where: { status: 'ACTIVE' },
+      select: {
+        id: true,
+        name: true,
+        _count: {
+          select: {
+            prices: {
+              where: { isActive: true }
+            }
+          }
+        }
+      },
+      orderBy: {
+        prices: {
+          _count: 'desc'
+        }
+      },
+      take: 5
+    });
+
+    const report = {
+      summary: {
+        totalProducts,
+        totalPrices,
+        totalStores,
+        totalUsers,
+        generatedAt: new Date().toISOString()
+      },
+      topProducts: topProducts.map(product => ({
+        id: product.id,
+        barcode: product.barcode,
+        name: product.name || `Product ${product.barcode}`,
+        priceObservations: product._count.prices,
+        latestPrice: product.prices.length > 0 ? product.prices[0].amount : null,
+        lastObserved: product.prices.length > 0 ? product.prices[0].observedAt : null
+      })),
+      recentActivity: recentActivity.map(price => ({
+        id: price.id,
+        productBarcode: price.product.barcode,
+        productName: price.product.name || `Product ${price.product.barcode}`,
+        amount: price.amount,
+        source: price.source,
+        storeName: price.store?.name || 'Shopper Report',
+        observedAt: price.observedAt,
+        createdAt: price.createdAt
+      })),
+      priceDistribution,
+      topStores: storeStats.map(store => ({
+        id: store.id,
+        name: store.name,
+        priceReports: store._count.prices
+      }))
+    };
+
+    res.json({
+      success: true,
+      report
+    });
+
+  } catch (error) {
+    logger.error('Error generating item report:', error);
+    next(error);
+  }
+}

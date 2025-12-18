@@ -124,7 +124,7 @@ export async function login(req, res, next) {
 export async function registerStoreSignup(req, res, next) {
   try {
     const {
-      name,
+      storeName,
       email,
       password,
       address,
@@ -146,7 +146,7 @@ export async function registerStoreSignup(req, res, next) {
 
     // Create store
     const newStore = await createStore({
-      name,
+      name: storeName,
       email,
       password: hashedPassword,
       address,
@@ -161,7 +161,7 @@ export async function registerStoreSignup(req, res, next) {
     // Since we need a userId and stores are created by users, we'll skip audit log for now
     // or create a system user for these operations
 
-    logger.info('Store registration successful:', { email, name, id: newStore.id });
+    logger.info('Store registration successful:', { email, storeName, id: newStore.id });
 
     res.status(201).json({
       success: true,
