@@ -481,7 +481,7 @@ export async function createAdminUser(req, res, next) {
       email,
       password: hashedPassword,
       role,
-      isActive: true
+      createdBy: adminUser.id
     });
 
     // Log the creation action

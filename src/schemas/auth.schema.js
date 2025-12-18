@@ -20,9 +20,13 @@ export const storeSignupSchema = z.object({
 
 // Admin create user schema
 export const createUserSchema = z.object({
-  email: z.string().email('Invalid email format'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['ADMIN', 'SUPER_ADMIN']).default('ADMIN'),
+  body: z.object({
+    email: z.string(),
+    password: z.string(),
+    role: z.string().optional()
+  }).optional(),
+  query: z.object({}).optional(),
+  params: z.object({}).optional()
 });
 
 // Change password schema

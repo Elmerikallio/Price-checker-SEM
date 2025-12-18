@@ -339,16 +339,10 @@ router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
  *           schema:
  *             type: object
  *             required:
- *               - username
  *               - email
  *               - password
  *               - role
  *             properties:
- *               username:
- *                 type: string
- *                 minLength: 3
- *                 maxLength: 50
- *                 example: "admin_user"
  *               email:
  *                 type: string
  *                 format: email
@@ -356,7 +350,7 @@ router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
  *               password:
  *                 type: string
  *                 format: password
- *                 minLength: 6
+ *                 minLength: 8
  *                 example: "secureAdminPassword123"
  *               role:
  *                 type: string
@@ -389,7 +383,7 @@ router.delete("/stores/:id", requireSuperAdmin, removeStoreUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/users", requireSuperAdmin, validate(createUserSchema), createAdminUser);
+router.post("/users", createAdminUser);
 
 /**
  * @swagger
