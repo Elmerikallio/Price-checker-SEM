@@ -565,6 +565,6 @@ router.post("/batch", requireStore, submitBatchObservations);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/products", requireStore, validate(storeProductPriceSchema), submitProductPriceList);
+router.post("/products", requireAuth, requireStore, validate(storeProductPriceSchema), submitProductPriceList);
 
 export default router;

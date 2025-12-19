@@ -119,8 +119,10 @@ export function requireStore(req, res, next) {
       throw new HttpError(401, 'Authentication required');
     }
 
-    if (req.user.type !== 'store') {
-      throw new HttpError(403, 'Store account required');
+    // Allow store accounts or SUPER_ADMIN users (for testing/administration)
+    if (req.user.type !== 'store' && 
+        !(req.user.type === 'user' && req.user.role === 'SUPER_ADMIN')) {
+      throw new HttpError(403, 'Store account or admin privileges required');
     }
 
     next();

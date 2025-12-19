@@ -52,6 +52,7 @@ async function getStoreListReport() {
 
       storeList.forEach((store, index) => {
         console.log(`${index + 1}. ${store.name}`);
+        console.log(`   🆔 ID: ${store.id}`);
         console.log(`   📧 Email: ${store.email}`);
         console.log(`   📍 Address: ${store.address || 'No address provided'}`);
         console.log(`   📞 Phone: ${store.phone || 'No phone provided'}`);

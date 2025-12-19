@@ -395,18 +395,54 @@ export async function submitBatchObservations(req, res, next) {
 export async function submitProductPriceList(req, res, next) {
   try {
     const { user } = req;
-    const { products } = req.body;
+    const { products, storeId: requestedStoreId } = req.body;
 
-    if (user.type !== 'store') {
+    // Allow store users or SUPER_ADMIN users
+    if (user.type !== 'store' && !(user.type === 'user' && user.role === 'SUPER_ADMIN')) {
       throw new HttpError(403, 'Store authentication required');
+    }
+
+    // Determine storeId to use
+    let storeId;
+    if (user.type === 'store') {
+      storeId = user.storeId;
+    } else if (user.type === 'user' && user.role === 'SUPER_ADMIN') {
+      // For admin users, use requested storeId or find first active store
+      if (requestedStoreId) {
+        storeId = requestedStoreId;
+      } else {
+        // Find first active store as default
+        const activeStore = await prisma.store.findFirst({
+          where: { status: 'ACTIVE' }
+        });
+        if (!activeStore) {
+          throw new HttpError(400, 'No active store found. Please specify storeId in request body');
+        }
+        storeId = activeStore.id;
+      }
     }
 
     let processed = 0;
     let errors = [];
     const results = [];
 
+    // Get store location if needed
+    let storeLocation = null;
+    if (products.some(p => !p.latitude || !p.longitude)) {
+      const store = await prisma.store.findUnique({
+        where: { id: storeId },
+        select: { latitude: true, longitude: true }
+      });
+      storeLocation = store;
+    }
+
     for (const product of products) {
       try {
+        // Use store location as fallback if product location not provided
+        const latitude = product.latitude || storeLocation?.latitude || 60.4518; // Default to Turku
+        const longitude = product.longitude || storeLocation?.longitude || 22.2666; // Default to Turku
+        const gtin = product.gtin || product.barcode; // Use barcode as fallback for gtin
+
         // Create the price observation with enhanced data structure
         const priceObservation = await createPriceObservation({
           barcode: product.barcode,
@@ -414,13 +450,13 @@ export async function submitProductPriceList(req, res, next) {
           productName: product.productName,
           price: product.price,
           currency: product.currency || 'EUR',
-          latitude: product.latitude,
-          longitude: product.longitude,
-          source: 'STORE_API',
-          storeId: user.storeId,
+          latitude: latitude,
+          longitude: longitude,
+          source: 'STORE_USER',
+          storeId: storeId,
           confidence: 1.0,
           metadata: {
-            gtin: product.gtin,
+            gtin: gtin,
             timestamp: product.timestamp,
             productCategory: product.productCategory,
             brand: product.brand,
@@ -429,42 +465,75 @@ export async function submitProductPriceList(req, res, next) {
           }
         });
 
+        // Create discount if provided
+        let discountInfo = null;
+        if (product.discount) {
+          try {
+            const discount = await prisma.discount.create({
+              data: {
+                storeId: storeId,
+                productId: priceObservation.productId,
+                percentage: product.discount.percentage,
+                validFrom: new Date(product.discount.validFrom),
+                validUntil: new Date(product.discount.validUntil || product.discount.validTo),
+                isActive: true
+              }
+            });
+            discountInfo = {
+              id: discount.id,
+              percentage: discount.percentage,
+              validFrom: discount.validFrom,
+              validUntil: discount.validUntil
+            };
+          } catch (discountError) {
+            logger.warn('Failed to create discount:', discountError.message);
+          }
+        }
+
         processed++;
         results.push({
           id: priceObservation.id,
           product: {
             barcode: product.barcode,
             barcodeType: product.barcodeType,
-            gtin: product.gtin,
+            gtin: gtin,
             name: product.productName
           },
           price: product.price,
           currency: product.currency || 'EUR',
           location: {
-            latitude: product.latitude,
-            longitude: product.longitude
+            latitude: latitude,
+            longitude: longitude
           },
           timestamp: product.timestamp,
-          status: 'processed'
+          status: 'processed',
+          discount: discountInfo
         });
 
-        // Log the activity
-        await prisma.auditLog.create({
-          data: {
-            storeId: user.storeId,
-            action: 'PRICE_BATCH_UPLOAD',
-            resource: 'Price',
-            details: {
-              productBarcode: product.barcode,
-              gtin: product.gtin,
-              price: product.price,
-              currency: product.currency,
-              source: product.source
-            },
-            ipAddress: req.ip,
-            userAgent: req.get('User-Agent')
-          }
-        });
+        // Log the activity (optional, don't fail if audit logging fails)
+        try {
+          await prisma.auditLog.create({
+            data: {
+              userId: user.id,
+              action: 'PRICE_BATCH_UPLOAD',
+              targetType: 'PRICE',
+              targetId: priceObservation.id,
+              details: {
+                productBarcode: product.barcode,
+                gtin: product.gtin,
+                price: product.price,
+                currency: product.currency,
+                source: product.source,
+                storeId: storeId
+              },
+              ipAddress: req.ip,
+              userAgent: req.get('User-Agent')
+            }
+          });
+        } catch (auditError) {
+          // Log audit error but don't fail the main operation
+          logger.warn('Audit logging failed:', auditError.message);
+        }
 
       } catch (error) {
         logger.error('Error processing product price:', {

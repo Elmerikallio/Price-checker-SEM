@@ -1,10 +1,16 @@
 export function validate(schema) {
   return (req, _res, next) => {
-    const result = schema.safeParse({
-      body: req.body,
-      query: req.query,
-      params: req.params,
-    });
+    // Try to parse the body directly first (most common case)
+    let result = schema.safeParse(req.body);
+
+    // If that fails, try the old format with body/query/params structure
+    if (!result.success) {
+      result = schema.safeParse({
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      });
+    }
 
     if (!result.success) {
       // Forward to your error handler (graceful errors)
@@ -15,8 +21,14 @@ export function validate(schema) {
       return next(err);
     }
 
-    // Optional: replace req.* with coerced/validated data
-    if (result.data.body) req.body = result.data.body;
+    // Replace req.* with coerced/validated data
+    if (result.data.body) {
+      req.body = result.data.body;
+    } else if (result.data && !result.data.body && !result.data.query && !result.data.params) {
+      // Direct body validation
+      req.body = result.data;
+    }
+    
     if (result.data.query) req.query = result.data.query;
     if (result.data.params) req.params = result.data.params;
 

@@ -17,11 +17,11 @@ export const storeProductPriceSchema = z.object({
     // Barcode data
     barcode: z.string().min(1, 'Barcode is required'),
     barcodeType: z.enum(['EAN13', 'EAN8', 'UPC_A', 'UPC_E', 'CODE128', 'CODE39'], 'Invalid barcode type'),
-    gtin: z.string().min(8, 'GTIN number must be at least 8 digits'), // Global Trade Item Number
+    gtin: z.string().min(8, 'GTIN number must be at least 8 digits').optional(), // Global Trade Item Number (optional)
     
-    // Location data (user's location in latitudes and longitudes)
-    latitude: z.number().min(-90).max(90, 'Invalid latitude'),
-    longitude: z.number().min(-180).max(180, 'Invalid longitude'),
+    // Location data (user's location in latitudes and longitudes) - optional, will use store location if not provided
+    latitude: z.number().min(-90).max(90, 'Invalid latitude').optional(),
+    longitude: z.number().min(-180).max(180, 'Invalid longitude').optional(),
     
     // Price information
     price: z.number().positive('Price must be positive'),
@@ -34,6 +34,14 @@ export const storeProductPriceSchema = z.object({
     productName: z.string().optional(),
     productCategory: z.string().optional(),
     brand: z.string().optional(),
+    
+    // Discount information (optional)
+    discount: z.object({
+      percentage: z.number().min(0).max(100, 'Discount percentage must be between 0 and 100'),
+      validFrom: z.string().datetime('Invalid validFrom date format'),
+      validUntil: z.string().datetime('Invalid validUntil date format').optional(),
+      validTo: z.string().datetime('Invalid validTo date format').optional()
+    }).optional(),
     
     // Additional metadata
     source: z.enum(['MANUAL', 'SCANNER', 'API']).default('MANUAL'),
